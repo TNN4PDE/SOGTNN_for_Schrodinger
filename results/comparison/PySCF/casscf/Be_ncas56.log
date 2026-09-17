@@ -1,0 +1,1180 @@
+#INFO: **** input file is /home/sjtu/TNNSOG/Pretrain/PySCF/Be_CASSCF_timed.py ****
+#!/usr/bin/env python3
+"""
+Be(1S) CASCI/CASSCF benchmark with per-macro-iteration wall timing.
+
+This script is intended for controlled comparison with SOG-TNN.
+
+What is optimized?
+------------------
+CASCI:
+    CI/configuration coefficients only; orbitals are fixed at the SCF orbitals.
+
+CASSCF:
+    CI/configuration coefficients + non-redundant orbital rotations.
+    PySCF parameterizes orbital rotations on the orthonormal MO manifold.
+    The orbitals remain inside the finite AO basis span; Gaussian exponents
+    and primitive basis functions themselves are NOT optimized.
+
+Timing
+------
+For each active-space size, the script writes a *_macro.csv file in real time.
+The first CASSCF AO->MO transformation + initial CASCI solve is reported as
+"initialization".  Each subsequent callback corresponds to one completed
+macro iteration.  Thus macro_step_wall_s is the wall time of that macro step
+(excluding the initial CASSCF setup), and cumulative_casscf_wall_s includes
+the initialization.
+
+Use --max-cycle-macro to choose how many macro iterations are allowed.
+For error-vs-time plots, use the per-macro CSV rather than relying only on
+PySCF's final ``converged`` flag.
+"""
+
+import argparse
+import csv
+import json
+import math
+import os
+import platform
+import resource
+import sys
+import time
+from pathlib import Path
+
+SYSTEM_LABEL = 'Be(1S)'
+ATOM_SPEC = 'Be 0 0 0'
+ELEMENT = 'Be'
+CHARGE = 0
+SPIN = 0          # PySCF convention: N_alpha - N_beta = 2S
+NELECAS = (2, 2) # all electrons active in the default benchmark
+E_REF = -14.6673600000000004
+SCF_KIND = 'RHF'
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description=f"{SYSTEM_LABEL} CASCI/CASSCF benchmark.")
+    p.add_argument("--basis", default='aug-cc-pCVQZ')
+    p.add_argument(
+        "--basis-source", choices=["auto", "pyscf", "bse", "file"], default="bse",
+        help="Use BSE for large Dunning bases not bundled with PySCF."
+    )
+    p.add_argument("--basis-file", default=None,
+                   help="Local NWChem-format basis file with --basis-source file.")
+    p.add_argument("--ncas", type=int, nargs="+", default=[4, 6, 8, 10, 12, 16, 20, 24])
+    p.add_argument("--threads", type=int, default=8)
+    p.add_argument("--memory-mb", type=int, default=64000)
+    p.add_argument("--conv-tol", type=float, default=1e-12)
+    p.add_argument("--conv-tol-grad", type=float, default=1e-7)
+    p.add_argument("--fci-conv-tol", type=float, default=1e-10)
+    p.add_argument("--max-cycle-macro", type=int, default=100)
+    p.add_argument("--max-cycle-micro", type=int, default=4)
+    p.add_argument("--max-stepsize", type=float, default=0.02)
+    p.add_argument("--prefix", default='Be_CASSCF')
+    p.add_argument("--eref", type=float, default=E_REF)
+    p.add_argument("--log-file", default=None)
+    return p.parse_args()
+
+
+args = parse_args()
+
+# Redirect before importing numerical libraries so all PySCF output is captured.
+_log_handle = None
+if args.log_file:
+    Path(args.log_file).parent.mkdir(parents=True, exist_ok=True)
+    _log_handle = open(args.log_file, "a", buffering=1, encoding="utf-8")
+    sys.stdout = _log_handle
+    sys.stderr = _log_handle
+
+# Limit threaded BLAS/OpenMP before NumPy/PySCF imports.
+for key in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
+    os.environ[key] = str(args.threads)
+
+import numpy as np
+import pyscf
+from pyscf import gto, scf, mcscf, lib
+
+
+def peak_rss_mb():
+    # Linux ru_maxrss is KiB.
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+
+
+def rel_error(e):
+    return abs(float(e) - args.eref) / abs(args.eref)
+
+
+def n_det(ncas):
+    na, nb = NELECAS
+    return math.comb(ncas, na) * math.comb(ncas, nb)
+
+
+def safe_float(x):
+    try:
+        if x is None:
+            return None
+        return float(x)
+    except Exception:
+        return None
+
+
+def load_basis():
+    src = args.basis_source
+    if src == "file":
+        if not args.basis_file:
+            raise ValueError("--basis-file is required with --basis-source file")
+        txt = Path(args.basis_file).read_text(encoding="utf-8", errors="ignore")
+        return {ELEMENT: gto.basis.parse(txt, symb=ELEMENT)}
+
+    if src == "bse":
+        try:
+            import basis_set_exchange as bse
+        except ImportError as exc:
+            raise RuntimeError(
+                "basis_set_exchange is required. Install once with:\n"
+                "  python -m pip install --user basis_set_exchange"
+            ) from exc
+        nwchem = bse.get_basis(args.basis, elements=[ELEMENT], fmt="nwchem")
+        return {ELEMENT: gto.basis.parse(nwchem, symb=ELEMENT)}
+
+    if src == "pyscf":
+        return {ELEMENT: gto.basis.load(args.basis, ELEMENT)}
+
+    return args.basis
+
+
+def make_scf(mol):
+    if SCF_KIND == "RHF":
+        mf = scf.RHF(mol)
+    elif SCF_KIND == "ROHF":
+        mf = scf.ROHF(mol)
+    else:
+        raise ValueError(f"Unknown SCF_KIND={SCF_KIND}")
+    mf.max_memory = args.memory_mb
+    mf.conv_tol = min(args.conv_tol, 1e-10)
+    mf.max_cycle = 100
+    return mf
+
+
+def make_casscf(mf, ncas):
+    # One-step is PySCF's standard CASSCF implementation.
+    mc = mcscf.CASSCF(mf, ncas, NELECAS)
+    mc.max_memory = args.memory_mb
+    mc.conv_tol = args.conv_tol
+    mc.conv_tol_grad = args.conv_tol_grad
+    mc.max_cycle_macro = args.max_cycle_macro
+    mc.max_cycle_micro = args.max_cycle_micro
+    mc.max_stepsize = args.max_stepsize
+    mc.fcisolver.conv_tol = args.fci_conv_tol
+    mc.fcisolver.spin = SPIN
+    return mc
+
+
+def exact_nonredundant_rotation_count(mc, nmo):
+    # This is the exact Boolean mask used internally by PySCF for unique
+    # orbital-rotation variables (core-active/core-virtual/active-virtual;
+    # redundant within-subspace rotations excluded by default).
+    mask = mc.uniq_var_indices(nmo, mc.ncore, mc.ncas, mc.frozen)
+    return int(np.count_nonzero(mask))
+
+
+def main():
+    lib.num_threads(args.threads)
+    basis_spec = load_basis()
+
+    mol = gto.M(
+        atom=ATOM_SPEC,
+        unit="Bohr",
+        charge=CHARGE,
+        spin=SPIN,
+        basis=basis_spec,
+        symmetry=False,
+        verbose=4,
+        max_memory=args.memory_mb,
+    )
+
+    print("=" * 92, flush=True)
+    print(f"{SYSTEM_LABEL} PySCF CASCI/CASSCF benchmark", flush=True)
+    print(f"PySCF version       : {pyscf.__version__}", flush=True)
+    print(f"Basis requested     : {args.basis}", flush=True)
+    print(f"Basis source        : {args.basis_source}", flush=True)
+    print(f"SCF reference       : {SCF_KIND}", flush=True)
+    print(f"System spin (2S)    : {SPIN}", flush=True)
+    print(f"Active electrons    : alpha/beta = {NELECAS}", flush=True)
+    print(f"Threads             : {args.threads}", flush=True)
+    print(f"Memory cap (MB)     : {args.memory_mb}", flush=True)
+    print(f"conv_tol            : {args.conv_tol:.3e}", flush=True)
+    print(f"conv_tol_grad       : {args.conv_tol_grad:.3e}", flush=True)
+    print(f"FCI conv_tol        : {args.fci_conv_tol:.3e}", flush=True)
+    print(f"max_cycle_macro     : {args.max_cycle_macro}", flush=True)
+    print(f"max_cycle_micro     : {args.max_cycle_micro}", flush=True)
+    print(f"max_stepsize        : {args.max_stepsize}", flush=True)
+    print(f"Reference energy    : {args.eref:.16f} Ha", flush=True)
+    print(f"Host                : {platform.node()}", flush=True)
+    print("=" * 92, flush=True)
+
+    mf = make_scf(mol)
+    t0 = time.perf_counter()
+    e_scf = mf.kernel()
+    t_scf = time.perf_counter() - t0
+    if not mf.converged:
+        raise RuntimeError(f"{SCF_KIND} did not converge.")
+
+    nmo = int(mf.mo_coeff.shape[1])
+    nao = int(mol.nao_nr())
+
+    print(f"\n{SCF_KIND} energy         : {e_scf:.16f} Ha", flush=True)
+    print(f"{SCF_KIND} relative error : {rel_error(e_scf):.6e}", flush=True)
+    print(f"{SCF_KIND} wall time      : {t_scf:.6f} s", flush=True)
+    print(f"NAO / NMO                  : {nao} / {nmo}", flush=True)
+    print(f"Peak RSS after SCF         : {peak_rss_mb():.2f} MB", flush=True)
+
+    results = {
+        "metadata": {
+            "system": SYSTEM_LABEL,
+            "reference_energy_hartree": args.eref,
+            "basis": args.basis,
+            "basis_source": args.basis_source,
+            "threads": args.threads,
+            "memory_cap_mb": args.memory_mb,
+            "pyscf_version": pyscf.__version__,
+            "host": platform.node(),
+            "nao": nao,
+            "nmo": nmo,
+            "spin_2S": SPIN,
+            "nelecas": list(NELECAS),
+            "scf_kind": SCF_KIND,
+            "scf_energy_hartree": float(e_scf),
+            "scf_relative_error": rel_error(e_scf),
+            "scf_wall_seconds": t_scf,
+        },
+        "active_space_results": [],
+    }
+
+    min_ncas = max(NELECAS)
+    valid_ncas = sorted(set(n for n in args.ncas if min_ncas <= n <= nmo))
+    skipped = sorted(set(args.ncas) - set(valid_ncas))
+    if skipped:
+        print(f"Skipping invalid ncas values (allowed {min_ncas}..{nmo}): {skipped}", flush=True)
+
+    safe_basis = args.basis.replace("*", "star").replace("/", "_").replace(" ", "_")
+
+    for ncas in valid_ncas:
+        ndet = n_det(ncas)
+
+        print("\n" + "-" * 92, flush=True)
+        print(f"Active space: CAS({sum(NELECAS)}e,{ncas}o), alpha/beta={NELECAS}", flush=True)
+        print(f"Determinant dimension N_det : {ndet}", flush=True)
+
+        # CASCI with fixed SCF orbitals
+        casci = mcscf.CASCI(mf, ncas, NELECAS)
+        casci.max_memory = args.memory_mb
+        casci.fcisolver.conv_tol = args.fci_conv_tol
+        casci.fcisolver.spin = SPIN
+
+        t0 = time.perf_counter()
+        casci_out = casci.kernel(mf.mo_coeff)
+        t_casci = time.perf_counter() - t0
+        e_casci = float(casci_out[0])
+
+        print(f"CASCI energy             : {e_casci:.16f} Ha", flush=True)
+        print(f"CASCI relative error     : {rel_error(e_casci):.6e}", flush=True)
+        print(f"CASCI wall time          : {t_casci:.6f} s", flush=True)
+
+        # CASSCF with orbital optimization
+        mc = make_casscf(mf, ncas)
+        nrot = exact_nonredundant_rotation_count(mc, nmo)
+        ncore = int(mc.ncore)
+        nvir = int(nmo - ncore - ncas)
+        full_active = (ncore == 0 and ncas == nmo)
+
+        print(f"ncore / nactive / nvirtual: {ncore} / {ncas} / {nvir}", flush=True)
+        print(f"Exact PySCF nonredundant orbital-rotation variables: {nrot}", flush=True)
+        if full_active:
+            print(
+                "NOTE: all MOs are active. CASCI is FCI in this finite AO space and "
+                "there are no nonredundant orbital rotations; CASSCF cannot lower "
+                "the energy further except for numerical noise.",
+                flush=True,
+            )
+
+        macro_path = Path(f"{args.prefix}_{safe_basis}_ncas{ncas:03d}_macro.csv")
+        macro_file = macro_path.open("w", newline="", encoding="utf-8", buffering=1)
+        macro_fields = [
+            "macro", "energy_hartree", "relative_error", "dE",
+            "grad_orb", "grad_ci", "ddm", "max_rot",
+            "jk_this_macro", "micro_this_macro",
+            "total_jk", "total_micro",
+            "macro_step_wall_s", "cumulative_macro_wall_s",
+            "cumulative_casscf_wall_s", "cumulative_peak_rss_mb",
+        ]
+        writer = csv.DictWriter(macro_file, fieldnames=macro_fields)
+        writer.writeheader()
+        macro_file.flush()
+
+        tracker = {
+            "kernel_start": None,
+            "initial_end": None,
+            "prev_callback": None,
+            "macro_rows": [],
+        }
+
+        # Wrap the CASSCF object's CASCI method only to identify the end of
+        # CASSCF initialization. The first call is the initial CASCI solve
+        # before macro iteration 1. This leaves the numerical algorithm unchanged.
+        original_casci = mc.casci
+
+        def timed_casci(*a, **kw):
+            out = original_casci(*a, **kw)
+            if tracker["initial_end"] is None:
+                now = time.perf_counter()
+                tracker["initial_end"] = now
+                tracker["prev_callback"] = now
+                init_s = now - tracker["kernel_start"]
+                print(f"[TIMING] CASSCF initialization = {init_s:.6f} s", flush=True)
+            return out
+
+        mc.casci = timed_casci
+
+        def callback(envs):
+            now = time.perf_counter()
+            prev = tracker["prev_callback"]
+            if prev is None:
+                prev = tracker["kernel_start"]
+            macro_step = now - prev
+            tracker["prev_callback"] = now
+
+            initial_end = tracker["initial_end"]
+            cum_macro = None if initial_end is None else now - initial_end
+            cum_casscf = now - tracker["kernel_start"]
+
+            imacro = int(envs.get("imacro", len(tracker["macro_rows"]) + 1))
+            e_tot = safe_float(envs.get("e_tot"))
+            row = {
+                "macro": imacro,
+                "energy_hartree": e_tot,
+                "relative_error": None if e_tot is None else rel_error(e_tot),
+                "dE": safe_float(envs.get("de")),
+                "grad_orb": safe_float(envs.get("norm_gorb0", envs.get("norm_gorb"))),
+                "grad_ci": safe_float(envs.get("norm_gci")),
+                "ddm": safe_float(envs.get("norm_ddm")),
+                "max_rot": safe_float(envs.get("max_offdiag_u")),
+                "jk_this_macro": int(envs["njk"]) if envs.get("njk") is not None else None,
+                "micro_this_macro": int(envs["imicro"]) if envs.get("imicro") is not None else None,
+                "total_jk": int(envs["totinner"]) if envs.get("totinner") is not None else None,
+                "total_micro": int(envs["totmicro"]) if envs.get("totmicro") is not None else None,
+                "macro_step_wall_s": macro_step,
+                "cumulative_macro_wall_s": cum_macro,
+                "cumulative_casscf_wall_s": cum_casscf,
+                "cumulative_peak_rss_mb": peak_rss_mb(),
+            }
+            writer.writerow(row)
+            macro_file.flush()
+            tracker["macro_rows"].append(row)
+
+            print(
+                "[MACRO_TIMING] "
+                f"ncas={ncas:3d} macro={imacro:3d} "
+                f"step={macro_step:10.6f} s "
+                f"cum_CASSCF={cum_casscf:10.6f} s "
+                f"E={e_tot:.15f} "
+                f"Er={row['relative_error']:.6e}",
+                flush=True,
+            )
+
+        mc.callback = callback
+
+        tracker["kernel_start"] = time.perf_counter()
+        casscf_out = mc.kernel(mf.mo_coeff)
+        t_casscf = time.perf_counter() - tracker["kernel_start"]
+        e_casscf = float(casscf_out[0])
+        macro_file.flush()
+        macro_file.close()
+
+        init_s = None
+        if tracker["initial_end"] is not None:
+            init_s = tracker["initial_end"] - tracker["kernel_start"]
+
+        print(f"CASSCF energy            : {e_casscf:.16f} Ha", flush=True)
+        print(f"CASSCF relative error    : {rel_error(e_casscf):.6e}", flush=True)
+        print(f"CASSCF total wall time   : {t_casscf:.6f} s", flush=True)
+        print(f"CASSCF initialization    : {init_s} s", flush=True)
+        print(f"CASSCF converged flag    : {bool(mc.converged)}", flush=True)
+        print(f"CASCI-CASSCF energy gain : {e_casci - e_casscf:.6e} Ha", flush=True)
+        print(f"Macro timing CSV         : {macro_path}", flush=True)
+
+        results["active_space_results"].append({
+            "ncas": ncas,
+            "nelecas_alpha": NELECAS[0],
+            "nelecas_beta": NELECAS[1],
+            "n_det": ndet,
+            "ncore": ncore,
+            "nvirtual": nvir,
+            "exact_nonredundant_orbital_rotations": nrot,
+            "full_active_space": full_active,
+            "casci_energy_hartree": e_casci,
+            "casci_relative_error": rel_error(e_casci),
+            "casci_wall_seconds": t_casci,
+            "casscf_energy_hartree": e_casscf,
+            "casscf_relative_error": rel_error(e_casscf),
+            "casscf_wall_seconds": t_casscf,
+            "casscf_initialization_seconds": init_s,
+            "casscf_converged": bool(mc.converged),
+            "n_macro_recorded": len(tracker["macro_rows"]),
+            "macro_timing_csv": str(macro_path),
+            "peak_rss_mb": peak_rss_mb(),
+            "orbital_relaxation_gain_hartree": e_casci - e_casscf,
+        })
+
+    json_path = Path(f"{args.prefix}_{safe_basis}.json")
+    csv_path = Path(f"{args.prefix}_{safe_basis}.csv")
+
+    with json_path.open("w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2)
+
+    summary_fields = [
+        "ncas", "nelecas_alpha", "nelecas_beta", "n_det",
+        "ncore", "nvirtual", "exact_nonredundant_orbital_rotations",
+        "full_active_space", "casci_energy_hartree", "casci_relative_error",
+        "casci_wall_seconds", "casscf_energy_hartree", "casscf_relative_error",
+        "casscf_wall_seconds", "casscf_initialization_seconds",
+        "casscf_converged", "n_macro_recorded", "macro_timing_csv",
+        "peak_rss_mb", "orbital_relaxation_gain_hartree",
+    ]
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=summary_fields)
+        w.writeheader()
+        w.writerows(results["active_space_results"])
+
+    print("\n" + "=" * 92, flush=True)
+    print(f"Saved summary JSON: {json_path}", flush=True)
+    print(f"Saved summary CSV : {csv_path}", flush=True)
+    print("=" * 92, flush=True)
+
+    if _log_handle is not None:
+        _log_handle.flush()
+
+
+if __name__ == "__main__":
+    main()
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='inspur-NF5468-M7-A0-R0-00', release='6.11.0-29-generic', version='#29~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Jun 26 14:16:59 UTC 2', machine='x86_64')  Threads 8
+Python 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+numpy 2.4.4  scipy 1.17.1  h5py 3.16.0
+Date: Wed Sep  2 15:47:17 2026
+PySCF version 2.10.0
+PySCF path  /home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 1
+[INPUT] num. electrons = 4
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = Bohr
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 Be     0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+
+nuclear repulsion = 0
+number of shells = 19
+number of NR pGTOs = 122
+number of NR cGTOs = 109
+basis = {'Be': [[0, [21.726, 1.0]], [0, [7.866, 1.0]], [0, [14630.0, 9.2e-05, 0.0, 0.0, -1.7e-05, 0.0], [2191.0, 0.000713, 0.0, 0.0, -0.00013, 0.0], [498.2, 0.003735, 0.0, 0.0, -0.000679, 0.0], [140.9, 0.015468, 0.0, 0.0, -0.002857, 0.0], [45.86, 0.052874, 0.0, 0.0, -0.009813, 0.0], [16.47, 0.145694, 0.0, 0.0, -0.028609, 0.0], [6.319, 0.302681, 0.0, 0.0, -0.06376, 0.0], [2.535, 0.404936, 0.0, 0.0, -0.117231, 0.0], [1.035, 0.222387, 0.0, 0.0, -0.121202, 0.0], [0.2528, 0.012912, 1.0, 0.0, 0.253229, 0.0], [0.1052, -0.004648, 0.0, 1.0, 0.581837, 0.0], [0.04261, 0.001228, 0.0, 0.0, 0.291954, 1.0]], [0, [2.848, 1.0]], [0, [0.01439, 1.0]], [1, [30.898, 1.0]], [1, [10.365, 1.0]], [1, [3.477, 1.0]], [1, [14.03, 0.0, 0.004099, 0.0, 0.0], [3.168, 0.0, 0.025626, 0.0, 0.0], [0.9024, 0.0, 0.103768, 0.0, 0.0], [0.3036, 1.0, 0.311547, 0.0, 0.0], [0.113, 0.0, 0.498128, 1.0, 0.0], [0.04286, 0.0, 0.258876, 0.0, 1.0]], [1, [0.0065, 1.0]], [2, [30.39, 1.0]], [2, [6.092, 1.0]], [2, [1.072, 1.0, 0.0, 0.0], [0.441, 0.0, 1.0, 0.0], [0.1811, 0.0, 0.0, 1.0]], [2, [0.0554, 1.0]], [3, [12.482, 1.0]], [3, [0.481, 1.0, 0.0], [0.255, 0.0, 1.0]], [3, [0.093, 1.0]], [4, [0.415, 1.0]], [4, [0.1834, 1.0]]]}
+ecp = {}
+CPU time:         1.15
+============================================================================================
+Be(1S) PySCF CASCI/CASSCF benchmark
+PySCF version       : 2.10.0
+Basis requested     : aug-cc-pCVQZ
+Basis source        : bse
+SCF reference       : RHF
+System spin (2S)    : 0
+Active electrons    : alpha/beta = (2, 2)
+Threads             : 8
+Memory cap (MB)     : 32000
+conv_tol            : 1.000e-12
+conv_tol_grad       : 1.000e-07
+FCI conv_tol        : 1.000e-10
+max_cycle_macro     : 100
+max_cycle_micro     : 4
+max_stepsize        : 0.02
+Reference energy    : -14.6673600000000004 Ha
+Host                : inspur-NF5468-M7-A0-R0-00
+============================================================================================
+
+
+******** <class 'pyscf.scf.hf.RHF'> ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-12
+SCF conv_tol_grad = None
+SCF max_cycles = 100
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /tmp/tmptdk289mh
+max_memory 32000 MB (current use 108 MB)
+Set gradient conv threshold to 1e-06
+Initial guess from minao.
+init E= -14.5711544456758
+  HOMO = -0.30192357826564  LUMO = 0.0142542630388506
+cycle= 1 E= -14.5728273342551  delta_E= -0.00167  |g|= 0.01  |ddm|= 0.469
+  HOMO = -0.30727924946478  LUMO = 0.0138444126349235
+cycle= 2 E= -14.572956530142  delta_E= -0.000129  |g|= 0.00283  |ddm|= 0.0892
+  HOMO = -0.309222346633052  LUMO = 0.0136456213093893
+cycle= 3 E= -14.57296912175  delta_E= -1.26e-05  |g|= 0.000246  |ddm|= 0.0303
+  HOMO = -0.309267098263386  LUMO = 0.0136335762566984
+cycle= 4 E= -14.5729692030671  delta_E= -8.13e-08  |g|= 1.76e-05  |ddm|= 0.00367
+  HOMO = -0.309271143968681  LUMO = 0.0136328550177539
+cycle= 5 E= -14.5729692036486  delta_E= -5.82e-10  |g|= 2.15e-06  |ddm|= 0.000181
+  HOMO = -0.309271293844976  LUMO = 0.0136327509479358
+cycle= 6 E= -14.5729692036568  delta_E= -8.18e-12  |g|= 5.13e-08  |ddm|= 4.46e-05
+  HOMO = -0.309271300891373  LUMO = 0.0136327510156762
+cycle= 7 E= -14.5729692036568  delta_E=    0  |g|= 1.95e-09  |ddm|= 7.32e-07
+  HOMO = -0.309271300564524  LUMO = 0.0136327509163661
+Extra cycle  E= -14.5729692036568  delta_E= -5.33e-15  |g|= 2.21e-10  |ddm|= 3.17e-08
+converged SCF energy = -14.5729692036568
+
+RHF energy         : -14.5729692036567826 Ha
+RHF relative error : 6.435432e-03
+RHF wall time      : 1.020215 s
+NAO / NMO                  : 109 / 109
+Peak RSS after SCF         : 381.26 MB
+
+--------------------------------------------------------------------------------------------
+Active space: CAS(4e,56o), alpha/beta=(2, 2)
+Determinant dimension N_det : 2371600
+
+******** <class 'pyscf.mcscf.casci.CASCI'> ********
+CAS (2e+2e, 56o), ncore = 0, nvir = 53
+natorb = False
+canonicalization = True
+sorting_mo_energy = False
+max_memory 32000 MB (current use 264 MB)
+******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
+max. cycles = 200
+conv_tol = 1e-10
+davidson only = False
+linear dependence = 1e-12
+level shift = 0.001
+max iter space = 12
+max_memory 32000 MB
+nroots = 1
+pspace_size = 400
+spin = 0
+Density matrix diagonal elements [1.99958081e+00 1.81683414e+00 4.03516727e-03 4.04964595e-03
+ 4.06014560e-03 9.76349737e-04 3.57428337e-02 3.57367621e-02
+ 3.59206510e-02 2.44614275e-05 2.43761544e-05 2.44806574e-05
+ 2.43131642e-05 2.44949128e-05 2.72536933e-03 1.83086927e-02
+ 1.81465848e-02 1.83066618e-02 2.51998635e-06 2.53496976e-06
+ 2.53251416e-06 2.52891119e-06 2.53780905e-06 2.53200997e-06
+ 2.52363057e-06 8.90412542e-05 8.89604398e-05 8.89506837e-05
+ 8.89924108e-05 8.89707649e-05 1.15538199e-03 1.13528618e-03
+ 1.14012607e-03 1.20369847e-03 7.71877093e-07 7.72895867e-07
+ 7.72980889e-07 7.71574217e-07 7.74675741e-07 7.71043023e-07
+ 7.74775751e-07 7.73396669e-07 7.73677811e-07 7.99887272e-06
+ 8.00033547e-06 8.10525750e-06 8.01326826e-06 7.99110350e-06
+ 8.03139196e-06 8.10216080e-06 1.71262477e-05 1.67635283e-05
+ 1.71693270e-05 1.70234198e-05 1.67939328e-05 2.08865295e-04]
+CASCI converged
+CASCI E = -14.6208951465357  E(CI) = -14.6208951465357  S^2 = 0.0000000
+CASCI energy             : -14.6208951465356947 Ha
+CASCI relative error     : 3.167908e-03
+CASCI wall time          : 1172.930702 s
+ncore / nactive / nvirtual: 0 / 56 / 53
+Exact PySCF nonredundant orbital-rotation variables: 2968
+Overwritten attributes  casci  of <class 'pyscf.mcscf.mc1step.CASSCF'>
+
+******** <class 'pyscf.mcscf.mc1step.CASSCF'> ********
+CAS (2e+2e, 56o), ncore = 0, nvir = 53
+max_cycle_macro = 100
+max_cycle_micro = 4
+conv_tol = 1e-12
+conv_tol_grad = 1e-07
+orbital rotation max_stepsize = 0.02
+orbital rotation threshold for CI restart = 0.01
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 1e-08
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = False
+canonicalization = True
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /tmp/tmptdk289mh
+max_memory 32000 MB (current use 434 MB)
+internal_rotation = False
+******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
+max. cycles = 50
+conv_tol = 1e-10
+davidson only = False
+linear dependence = 1e-12
+level shift = 0.001
+max iter space = 12
+max_memory 32000 MB
+nroots = 1
+pspace_size = 400
+spin = 0
+CASCI E = -14.6208951465357  S^2 = 0.0000000
+[TIMING] CASSCF initialization = 1157.728193 s
+[MACRO_TIMING] ncas= 56 macro=  1 step=884.952086 s cum_CASSCF=2042.680279 s E=-14.620895146535693 Er=3.167908e-03
+[MACRO_TIMING] ncas= 56 macro=  1 step=879.411644 s cum_CASSCF=2922.091923 s E=-14.620895146535693 Er=3.167908e-03
+[MACRO_TIMING] ncas= 56 macro=  1 step=885.800579 s cum_CASSCF=3807.892502 s E=-14.620895146535693 Er=3.167908e-03
+macro iter   1 ( 21 JK    4 micro), CASSCF E = -14.6249092398279  dE = -4.01409329e-03  S^2 = 0.0000000
+               |grad[o]|=0.00869  |grad[c]|=0.0329  |ddm|=0.000807  |maxRot[o]|=0.312
+[MACRO_TIMING] ncas= 56 macro=  1 step=1232.256286 s cum_CASSCF=5040.148788 s E=-14.624909239827891 Er=2.894233e-03
+[MACRO_TIMING] ncas= 56 macro=  2 step=666.992791 s cum_CASSCF=5707.141579 s E=-14.624909239827891 Er=2.894233e-03
+[MACRO_TIMING] ncas= 56 macro=  2 step=863.961095 s cum_CASSCF=6571.102674 s E=-14.624909239827891 Er=2.894233e-03
+[MACRO_TIMING] ncas= 56 macro=  2 step=881.207950 s cum_CASSCF=7452.310624 s E=-14.624909239827891 Er=2.894233e-03
+macro iter   2 ( 21 JK    4 micro), CASSCF E = -14.6329999705858  dE = -8.09073076e-03  S^2 = 0.0000000
+               |grad[o]|=0.00943  |grad[c]|=0.0544  |ddm|=0.0022  |maxRot[o]|=0.306
+[MACRO_TIMING] ncas= 56 macro=  2 step=1498.363637 s cum_CASSCF=8950.674261 s E=-14.632999970585816 Er=2.342619e-03
+[MACRO_TIMING] ncas= 56 macro=  3 step=655.666437 s cum_CASSCF=9606.340698 s E=-14.632999970585816 Er=2.342619e-03
+[MACRO_TIMING] ncas= 56 macro=  3 step=829.568967 s cum_CASSCF=10435.909665 s E=-14.632999970585816 Er=2.342619e-03
+[MACRO_TIMING] ncas= 56 macro=  3 step=919.530769 s cum_CASSCF=11355.440433 s E=-14.632999970585816 Er=2.342619e-03
+macro iter   3 ( 21 JK    4 micro), CASSCF E = -14.6425852972136  dE = -9.58532663e-03  S^2 = 0.0000000
+               |grad[o]|=0.0212  |grad[c]|=0.033  |ddm|=0.00067  |maxRot[o]|=0.301
+[MACRO_TIMING] ncas= 56 macro=  3 step=1809.730344 s cum_CASSCF=13165.170778 s E=-14.642585297213554 Er=1.689104e-03
+[MACRO_TIMING] ncas= 56 macro=  4 step=631.220239 s cum_CASSCF=13796.391016 s E=-14.642585297213554 Er=1.689104e-03
+[MACRO_TIMING] ncas= 56 macro=  4 step=832.737415 s cum_CASSCF=14629.128431 s E=-14.642585297213554 Er=1.689104e-03
+[MACRO_TIMING] ncas= 56 macro=  4 step=838.783784 s cum_CASSCF=15467.912215 s E=-14.642585297213554 Er=1.689104e-03
+macro iter   4 ( 21 JK    4 micro), CASSCF E = -14.6508546524104  dE = -8.26935520e-03  S^2 = 0.0000000
+               |grad[o]|=0.00916  |grad[c]|=0.0369  |ddm|=0.000867  |maxRot[o]|= 0.31
+[MACRO_TIMING] ncas= 56 macro=  4 step=1917.607428 s cum_CASSCF=17385.519643 s E=-14.650854652410441 Er=1.125311e-03
+[MACRO_TIMING] ncas= 56 macro=  5 step=632.971870 s cum_CASSCF=18018.491514 s E=-14.650854652410441 Er=1.125311e-03
+[MACRO_TIMING] ncas= 56 macro=  5 step=828.264571 s cum_CASSCF=18846.756085 s E=-14.650854652410441 Er=1.125311e-03
+[MACRO_TIMING] ncas= 56 macro=  5 step=829.258688 s cum_CASSCF=19676.014773 s E=-14.650854652410441 Er=1.125311e-03
+macro iter   5 ( 21 JK    4 micro), CASSCF E = -14.6563100777232  dE = -5.45542531e-03  S^2 = 0.0000000
+               |grad[o]|=0.00795  |grad[c]|=0.0113  |ddm|=0.000875  |maxRot[o]|= 0.31
+[MACRO_TIMING] ncas= 56 macro=  5 step=2002.657168 s cum_CASSCF=21678.671941 s E=-14.656310077723209 Er=7.533682e-04
+[MACRO_TIMING] ncas= 56 macro=  6 step=632.238895 s cum_CASSCF=22310.910836 s E=-14.656310077723209 Er=7.533682e-04
+[MACRO_TIMING] ncas= 56 macro=  6 step=828.784694 s cum_CASSCF=23139.695530 s E=-14.656310077723209 Er=7.533682e-04
+[MACRO_TIMING] ncas= 56 macro=  6 step=827.427139 s cum_CASSCF=23967.122669 s E=-14.656310077723209 Er=7.533682e-04
+macro iter   6 ( 21 JK    4 micro), CASSCF E = -14.6570087794795  dE = -6.98701756e-04  S^2 = 0.0000000
+               |grad[o]|=0.00298  |grad[c]|=0.00939  |ddm|=0.000501  |maxRot[o]|=0.306
+[MACRO_TIMING] ncas= 56 macro=  6 step=2126.428117 s cum_CASSCF=26093.550786 s E=-14.657008779479487 Er=7.057317e-04
+[MACRO_TIMING] ncas= 56 macro=  7 step=633.328183 s cum_CASSCF=26726.878969 s E=-14.657008779479487 Er=7.057317e-04
+[MACRO_TIMING] ncas= 56 macro=  7 step=828.816060 s cum_CASSCF=27555.695029 s E=-14.657008779479487 Er=7.057317e-04
+[MACRO_TIMING] ncas= 56 macro=  7 step=831.317716 s cum_CASSCF=28387.012745 s E=-14.657008779479487 Er=7.057317e-04
+macro iter   7 ( 21 JK    4 micro), CASSCF E = -14.6579160413135  dE = -9.07261834e-04  S^2 = 0.0000000
+               |grad[o]|=0.00151  |grad[c]|=0.0224  |ddm|=0.000264  |maxRot[o]|= 0.25
+[MACRO_TIMING] ncas= 56 macro=  7 step=2747.529303 s cum_CASSCF=31134.542049 s E=-14.657916041313509 Er=6.438758e-04
+[MACRO_TIMING] ncas= 56 macro=  8 step=629.260780 s cum_CASSCF=31763.802829 s E=-14.657916041313509 Er=6.438758e-04
+[MACRO_TIMING] ncas= 56 macro=  8 step=826.317301 s cum_CASSCF=32590.120130 s E=-14.657916041313509 Er=6.438758e-04
+[MACRO_TIMING] ncas= 56 macro=  8 step=829.313468 s cum_CASSCF=33419.433598 s E=-14.657916041313509 Er=6.438758e-04
+macro iter   8 ( 21 JK    4 micro), CASSCF E = -14.6592146394125  dE = -1.29859810e-03  S^2 = 0.0000000
+               |grad[o]|=0.00131  |grad[c]|=0.0162  |ddm|=0.000237  |maxRot[o]|=0.308
+[MACRO_TIMING] ncas= 56 macro=  8 step=2863.818775 s cum_CASSCF=36283.252374 s E=-14.659214639412509 Er=5.553392e-04
+[MACRO_TIMING] ncas= 56 macro=  9 step=631.545703 s cum_CASSCF=36914.798076 s E=-14.659214639412509 Er=5.553392e-04
+[MACRO_TIMING] ncas= 56 macro=  9 step=830.961746 s cum_CASSCF=37745.759822 s E=-14.659214639412509 Er=5.553392e-04
+[MACRO_TIMING] ncas= 56 macro=  9 step=828.309780 s cum_CASSCF=38574.069602 s E=-14.659214639412509 Er=5.553392e-04
+macro iter   9 ( 21 JK    4 micro), CASSCF E = -14.6606129664525  dE = -1.39832704e-03  S^2 = 0.0000000
+               |grad[o]|=0.00125  |grad[c]|=0.0135  |ddm|=0.000152  |maxRot[o]|=0.298
+[MACRO_TIMING] ncas= 56 macro=  9 step=3180.623167 s cum_CASSCF=41754.692768 s E=-14.660612966452497 Er=4.600033e-04
+[MACRO_TIMING] ncas= 56 macro= 10 step=630.680222 s cum_CASSCF=42385.372991 s E=-14.660612966452497 Er=4.600033e-04
+[MACRO_TIMING] ncas= 56 macro= 10 step=829.990191 s cum_CASSCF=43215.363182 s E=-14.660612966452497 Er=4.600033e-04
+[MACRO_TIMING] ncas= 56 macro= 10 step=827.246608 s cum_CASSCF=44042.609790 s E=-14.660612966452497 Er=4.600033e-04
+macro iter  10 ( 21 JK    4 micro), CASSCF E = -14.6619429093857  dE = -1.32994293e-03  S^2 = 0.0000000
+               |grad[o]|=0.00105  |grad[c]|=0.0132  |ddm|=8.62e-05  |maxRot[o]|= 0.31
+[MACRO_TIMING] ncas= 56 macro= 10 step=2962.229934 s cum_CASSCF=47004.839724 s E=-14.661942909385660 Er=3.693296e-04
+[MACRO_TIMING] ncas= 56 macro= 11 step=635.973328 s cum_CASSCF=47640.813052 s E=-14.661942909385660 Er=3.693296e-04
+[MACRO_TIMING] ncas= 56 macro= 11 step=826.876074 s cum_CASSCF=48467.689126 s E=-14.661942909385660 Er=3.693296e-04
+[MACRO_TIMING] ncas= 56 macro= 11 step=825.287372 s cum_CASSCF=49292.976498 s E=-14.661942909385660 Er=3.693296e-04
+macro iter  11 ( 21 JK    4 micro), CASSCF E = -14.6629407710540  dE = -9.97861668e-04  S^2 = 0.0000000
+               |grad[o]|=0.000914  |grad[c]|=0.0104  |ddm|=8.54e-05  |maxRot[o]|=0.275
+[MACRO_TIMING] ncas= 56 macro= 11 step=3904.188421 s cum_CASSCF=53197.164919 s E=-14.662940771053975 Er=3.012968e-04
+[MACRO_TIMING] ncas= 56 macro= 12 step=633.517696 s cum_CASSCF=53830.682615 s E=-14.662940771053975 Er=3.012968e-04
+[MACRO_TIMING] ncas= 56 macro= 12 step=824.667443 s cum_CASSCF=54655.350059 s E=-14.662940771053975 Er=3.012968e-04
+[MACRO_TIMING] ncas= 56 macro= 12 step=825.950217 s cum_CASSCF=55481.300276 s E=-14.662940771053975 Er=3.012968e-04
+macro iter  12 ( 21 JK    4 micro), CASSCF E = -14.6634292512679  dE = -4.88480214e-04  S^2 = 0.0000000
+               |grad[o]|=0.00062  |grad[c]|=0.0141  |ddm|=6.44e-05  |maxRot[o]|=0.253
+[MACRO_TIMING] ncas= 56 macro= 12 step=3908.291043 s cum_CASSCF=59389.591319 s E=-14.663429251267885 Er=2.679929e-04
+[MACRO_TIMING] ncas= 56 macro= 13 step=629.332521 s cum_CASSCF=60018.923840 s E=-14.663429251267885 Er=2.679929e-04
+[MACRO_TIMING] ncas= 56 macro= 13 step=824.848252 s cum_CASSCF=60843.772092 s E=-14.663429251267885 Er=2.679929e-04
+[MACRO_TIMING] ncas= 56 macro= 13 step=824.930799 s cum_CASSCF=61668.702891 s E=-14.663429251267885 Er=2.679929e-04
+macro iter  13 ( 21 JK    4 micro), CASSCF E = -14.6636489865631  dE = -2.19735295e-04  S^2 = 0.0000000
+               |grad[o]|=0.000555  |grad[c]|=0.00544  |ddm|=4.99e-05  |maxRot[o]|= 0.31
+[MACRO_TIMING] ncas= 56 macro= 13 step=4224.650775 s cum_CASSCF=65893.353666 s E=-14.663648986563137 Er=2.530117e-04
+[MACRO_TIMING] ncas= 56 macro= 14 step=628.874620 s cum_CASSCF=66522.228286 s E=-14.663648986563137 Er=2.530117e-04
+[MACRO_TIMING] ncas= 56 macro= 14 step=826.113815 s cum_CASSCF=67348.342101 s E=-14.663648986563137 Er=2.530117e-04
+[MACRO_TIMING] ncas= 56 macro= 14 step=832.863914 s cum_CASSCF=68181.206015 s E=-14.663648986563137 Er=2.530117e-04
+macro iter  14 ( 21 JK    4 micro), CASSCF E = -14.6638437926401  dE = -1.94806077e-04  S^2 = 0.0000000
+               |grad[o]|=0.000463  |grad[c]|=0.00908  |ddm|=4.3e-05  |maxRot[o]|=0.287
+[MACRO_TIMING] ncas= 56 macro= 14 step=4120.286987 s cum_CASSCF=72301.493002 s E=-14.663843792640060 Er=2.397301e-04
+[MACRO_TIMING] ncas= 56 macro= 15 step=630.326057 s cum_CASSCF=72931.819058 s E=-14.663843792640060 Er=2.397301e-04
+[MACRO_TIMING] ncas= 56 macro= 15 step=827.451557 s cum_CASSCF=73759.270615 s E=-14.663843792640060 Er=2.397301e-04
+[MACRO_TIMING] ncas= 56 macro= 15 step=827.210573 s cum_CASSCF=74586.481188 s E=-14.663843792640060 Er=2.397301e-04
+macro iter  15 ( 21 JK    4 micro), CASSCF E = -14.6640404539858  dE = -1.96661346e-04  S^2 = 0.0000000
+               |grad[o]|=0.000368  |grad[c]|=0.00808  |ddm|=2.51e-05  |maxRot[o]|=0.308
+[MACRO_TIMING] ncas= 56 macro= 15 step=4125.334331 s cum_CASSCF=78711.815519 s E=-14.664040453985828 Er=2.263220e-04
+[MACRO_TIMING] ncas= 56 macro= 16 step=632.523824 s cum_CASSCF=79344.339343 s E=-14.664040453985828 Er=2.263220e-04
+[MACRO_TIMING] ncas= 56 macro= 16 step=828.086997 s cum_CASSCF=80172.426340 s E=-14.664040453985828 Er=2.263220e-04
+[MACRO_TIMING] ncas= 56 macro= 16 step=827.222987 s cum_CASSCF=80999.649327 s E=-14.664040453985828 Er=2.263220e-04
+macro iter  16 ( 21 JK    4 micro), CASSCF E = -14.6642201204756  dE = -1.79666490e-04  S^2 = 0.0000000
+               |grad[o]|=0.000486  |grad[c]|=0.00822  |ddm|=3.59e-05  |maxRot[o]|=0.258
+[MACRO_TIMING] ncas= 56 macro= 16 step=4448.733077 s cum_CASSCF=85448.382404 s E=-14.664220120475614 Er=2.140726e-04
+[MACRO_TIMING] ncas= 56 macro= 17 step=632.464888 s cum_CASSCF=86080.847292 s E=-14.664220120475614 Er=2.140726e-04
+[MACRO_TIMING] ncas= 56 macro= 17 step=826.944371 s cum_CASSCF=86907.791663 s E=-14.664220120475614 Er=2.140726e-04
+[MACRO_TIMING] ncas= 56 macro= 17 step=826.236356 s cum_CASSCF=87734.028019 s E=-14.664220120475614 Er=2.140726e-04
+macro iter  17 ( 21 JK    4 micro), CASSCF E = -14.6642954824861  dE = -7.53620105e-05  S^2 = 0.0000000
+               |grad[o]|=0.000566  |grad[c]|=0.00527  |ddm|=3.16e-05  |maxRot[o]|=0.247
+[MACRO_TIMING] ncas= 56 macro= 17 step=5735.894546 s cum_CASSCF=93469.922565 s E=-14.664295482486065 Er=2.089345e-04
+[MACRO_TIMING] ncas= 56 macro= 18 step=630.773936 s cum_CASSCF=94100.696501 s E=-14.664295482486065 Er=2.089345e-04
+[MACRO_TIMING] ncas= 56 macro= 18 step=826.911083 s cum_CASSCF=94927.607584 s E=-14.664295482486065 Er=2.089345e-04
+[MACRO_TIMING] ncas= 56 macro= 18 step=850.852646 s cum_CASSCF=95778.460230 s E=-14.664295482486065 Er=2.089345e-04
+macro iter  18 ( 21 JK    4 micro), CASSCF E = -14.6644006431608  dE = -1.05160675e-04  S^2 = 0.0000000
+               |grad[o]|=0.000328  |grad[c]|=0.0121  |ddm|=1.63e-05  |maxRot[o]|=0.292
+[MACRO_TIMING] ncas= 56 macro= 18 step=6101.231353 s cum_CASSCF=101879.691584 s E=-14.664400643160803 Er=2.017648e-04
+[MACRO_TIMING] ncas= 56 macro= 19 step=675.915542 s cum_CASSCF=102555.607126 s E=-14.664400643160803 Er=2.017648e-04
+macro iter  19 (  5 JK    1 micro), CASSCF E = -14.6644259747005  dE = -2.53315397e-05  S^2 = 0.0000000
+               |grad[o]|=0.000246  |grad[c]|=0.00821  |ddm|=5.24e-06  |maxRot[o]|= 0.04
+[MACRO_TIMING] ncas= 56 macro= 19 step=4584.498007 s cum_CASSCF=107140.105133 s E=-14.664425974700467 Er=2.000377e-04
+[MACRO_TIMING] ncas= 56 macro= 20 step=630.967779 s cum_CASSCF=107771.072912 s E=-14.664425974700467 Er=2.000377e-04
+[MACRO_TIMING] ncas= 56 macro= 20 step=827.049522 s cum_CASSCF=108598.122435 s E=-14.664425974700467 Er=2.000377e-04
+[MACRO_TIMING] ncas= 56 macro= 20 step=830.519189 s cum_CASSCF=109428.641623 s E=-14.664425974700467 Er=2.000377e-04
+macro iter  20 ( 21 JK    4 micro), CASSCF E = -14.6645936237127  dE = -1.67649012e-04  S^2 = 0.0000000
+               |grad[o]|=0.000357  |grad[c]|=0.0112  |ddm|=1.79e-05  |maxRot[o]|=0.307
+[MACRO_TIMING] ncas= 56 macro= 20 step=6063.353567 s cum_CASSCF=115491.995190 s E=-14.664593623712717 Er=1.886076e-04
+[MACRO_TIMING] ncas= 56 macro= 21 step=706.494815 s cum_CASSCF=116198.490005 s E=-14.664593623712717 Er=1.886076e-04
+[MACRO_TIMING] ncas= 56 macro= 21 step=873.770461 s cum_CASSCF=117072.260466 s E=-14.664593623712717 Er=1.886076e-04
+[MACRO_TIMING] ncas= 56 macro= 21 step=922.876727 s cum_CASSCF=117995.137193 s E=-14.664593623712717 Er=1.886076e-04
+macro iter  21 ( 21 JK    4 micro), CASSCF E = -14.6646842089945  dE = -9.05852817e-05  S^2 = 0.0000000
+               |grad[o]|=0.000208  |grad[c]|=0.00722  |ddm|=9e-06  |maxRot[o]|=0.304
+[MACRO_TIMING] ncas= 56 macro= 21 step=5285.137150 s cum_CASSCF=123280.274343 s E=-14.664684208994462 Er=1.824317e-04
+[MACRO_TIMING] ncas= 56 macro= 22 step=629.135569 s cum_CASSCF=123909.409913 s E=-14.664684208994462 Er=1.824317e-04
+macro iter  22 (  5 JK    1 micro), CASSCF E = -14.6646937229105  dE = -9.51391604e-06  S^2 = 0.0000000
+               |grad[o]|=0.000132  |grad[c]|=0.00545  |ddm|=5.84e-06  |maxRot[o]|= 0.04
+[MACRO_TIMING] ncas= 56 macro= 22 step=3917.725438 s cum_CASSCF=127827.135351 s E=-14.664693722910505 Er=1.817830e-04
+[MACRO_TIMING] ncas= 56 macro= 23 step=629.122206 s cum_CASSCF=128456.257557 s E=-14.664693722910505 Er=1.817830e-04
+macro iter  23 (  4 JK    1 micro), CASSCF E = -14.6646980666888  dE = -4.34377828e-06  S^2 = 0.0000000
+               |grad[o]|=0.000198  |grad[c]|=0.00243  |ddm|=5.63e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 23 step=3074.813578 s cum_CASSCF=131531.071135 s E=-14.664698066688786 Er=1.814869e-04
+[MACRO_TIMING] ncas= 56 macro= 24 step=629.793173 s cum_CASSCF=132160.864308 s E=-14.664698066688786 Er=1.814869e-04
+[MACRO_TIMING] ncas= 56 macro= 24 step=825.879152 s cum_CASSCF=132986.743460 s E=-14.664698066688786 Er=1.814869e-04
+[MACRO_TIMING] ncas= 56 macro= 24 step=825.449738 s cum_CASSCF=133812.193199 s E=-14.664698066688786 Er=1.814869e-04
+macro iter  24 ( 20 JK    4 micro), CASSCF E = -14.6647357890159  dE = -3.77223271e-05  S^2 = 0.0000000
+               |grad[o]|=0.000367  |grad[c]|=0.00623  |ddm|=8.04e-06  |maxRot[o]|=0.284
+[MACRO_TIMING] ncas= 56 macro= 24 step=5707.829958 s cum_CASSCF=139520.023157 s E=-14.664735789015902 Er=1.789150e-04
+[MACRO_TIMING] ncas= 56 macro= 25 step=630.013175 s cum_CASSCF=140150.036332 s E=-14.664735789015902 Er=1.789150e-04
+[MACRO_TIMING] ncas= 56 macro= 25 step=824.791244 s cum_CASSCF=140974.827575 s E=-14.664735789015902 Er=1.789150e-04
+[MACRO_TIMING] ncas= 56 macro= 25 step=824.421600 s cum_CASSCF=141799.249175 s E=-14.664735789015902 Er=1.789150e-04
+macro iter  25 ( 21 JK    4 micro), CASSCF E = -14.6647842959330  dE = -4.85069171e-05  S^2 = 0.0000000
+               |grad[o]|=0.000111  |grad[c]|=0.00733  |ddm|=6.46e-06  |maxRot[o]|=0.279
+[MACRO_TIMING] ncas= 56 macro= 25 step=5837.932479 s cum_CASSCF=147637.181654 s E=-14.664784295932963 Er=1.756079e-04
+[MACRO_TIMING] ncas= 56 macro= 26 step=628.620611 s cum_CASSCF=148265.802265 s E=-14.664784295932963 Er=1.756079e-04
+[MACRO_TIMING] ncas= 56 macro= 26 step=824.698074 s cum_CASSCF=149090.500339 s E=-14.664784295932963 Er=1.756079e-04
+[MACRO_TIMING] ncas= 56 macro= 26 step=835.155467 s cum_CASSCF=149925.655807 s E=-14.664784295932963 Er=1.756079e-04
+macro iter  26 ( 15 JK    3 micro), CASSCF E = -14.6648008784075  dE = -1.65824746e-05  S^2 = 0.0000000
+               |grad[o]|=8.1e-05  |grad[c]|=0.00386  |ddm|=5.44e-06  |maxRot[o]|=0.197
+[MACRO_TIMING] ncas= 56 macro= 26 step=4684.092288 s cum_CASSCF=154609.748095 s E=-14.664800878407519 Er=1.744773e-04
+[MACRO_TIMING] ncas= 56 macro= 27 step=705.896489 s cum_CASSCF=155315.644584 s E=-14.664800878407519 Er=1.744773e-04
+[MACRO_TIMING] ncas= 56 macro= 27 step=887.900811 s cum_CASSCF=156203.545395 s E=-14.664800878407519 Er=1.744773e-04
+[MACRO_TIMING] ncas= 56 macro= 27 step=826.381664 s cum_CASSCF=157029.927059 s E=-14.664800878407519 Er=1.744773e-04
+macro iter  27 ( 19 JK    4 micro), CASSCF E = -14.6648285707626  dE = -2.76923551e-05  S^2 = 0.0000000
+               |grad[o]|=9.55e-05  |grad[c]|=0.00931  |ddm|=1.11e-05  |maxRot[o]|=0.209
+[MACRO_TIMING] ncas= 56 macro= 27 step=5852.438340 s cum_CASSCF=162882.365399 s E=-14.664828570762616 Er=1.725893e-04
+[MACRO_TIMING] ncas= 56 macro= 28 step=630.110572 s cum_CASSCF=163512.475971 s E=-14.664828570762616 Er=1.725893e-04
+[MACRO_TIMING] ncas= 56 macro= 28 step=825.359504 s cum_CASSCF=164337.835475 s E=-14.664828570762616 Er=1.725893e-04
+[MACRO_TIMING] ncas= 56 macro= 28 step=825.337114 s cum_CASSCF=165163.172589 s E=-14.664828570762616 Er=1.725893e-04
+macro iter  28 ( 21 JK    4 micro), CASSCF E = -14.6648612128101  dE = -3.26420475e-05  S^2 = 0.0000000
+               |grad[o]|=0.00013  |grad[c]|=0.00827  |ddm|=1.37e-05  |maxRot[o]|=0.287
+[MACRO_TIMING] ncas= 56 macro= 28 step=5709.877183 s cum_CASSCF=170873.049772 s E=-14.664861212810134 Er=1.703638e-04
+[MACRO_TIMING] ncas= 56 macro= 29 step=628.696213 s cum_CASSCF=171501.745985 s E=-14.664861212810134 Er=1.703638e-04
+[MACRO_TIMING] ncas= 56 macro= 29 step=824.744957 s cum_CASSCF=172326.490942 s E=-14.664861212810134 Er=1.703638e-04
+[MACRO_TIMING] ncas= 56 macro= 29 step=825.097351 s cum_CASSCF=173151.588294 s E=-14.664861212810134 Er=1.703638e-04
+macro iter  29 ( 19 JK    4 micro), CASSCF E = -14.6648804201896  dE = -1.92073794e-05  S^2 = 0.0000000
+               |grad[o]|=0.000126  |grad[c]|=0.00662  |ddm|=1.13e-05  |maxRot[o]|=0.232
+[MACRO_TIMING] ncas= 56 macro= 29 step=5709.276292 s cum_CASSCF=178860.864586 s E=-14.664880420189583 Er=1.690543e-04
+[MACRO_TIMING] ncas= 56 macro= 30 step=628.349531 s cum_CASSCF=179489.214117 s E=-14.664880420189583 Er=1.690543e-04
+macro iter  30 (  6 JK    1 micro), CASSCF E = -14.6648841702203  dE = -3.75003069e-06  S^2 = 0.0000000
+               |grad[o]|=0.000124  |grad[c]|=0.00451  |ddm|=6.02e-06  |maxRot[o]|=0.0597
+[MACRO_TIMING] ncas= 56 macro= 30 step=5501.567129 s cum_CASSCF=184990.781246 s E=-14.664884170220271 Er=1.687986e-04
+[MACRO_TIMING] ncas= 56 macro= 31 step=628.906681 s cum_CASSCF=185619.687926 s E=-14.664884170220271 Er=1.687986e-04
+macro iter  31 (  4 JK    1 micro), CASSCF E = -14.6648854424039  dE = -1.27218366e-06  S^2 = 0.0000000
+               |grad[o]|=0.000101  |grad[c]|=0.0019  |ddm|=2.98e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 31 step=4447.671460 s cum_CASSCF=190067.359386 s E=-14.664885442403932 Er=1.687119e-04
+[MACRO_TIMING] ncas= 56 macro= 32 step=628.353823 s cum_CASSCF=190695.713209 s E=-14.664885442403932 Er=1.687119e-04
+macro iter  32 (  4 JK    1 micro), CASSCF E = -14.6648865836364  dE = -1.14123245e-06  S^2 = 0.0000000
+               |grad[o]|=8.96e-05  |grad[c]|=0.00199  |ddm|=4.3e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 32 step=4232.593875 s cum_CASSCF=194928.307084 s E=-14.664886583636385 Er=1.686341e-04
+[MACRO_TIMING] ncas= 56 macro= 33 step=629.390871 s cum_CASSCF=195557.697955 s E=-14.664886583636385 Er=1.686341e-04
+macro iter  33 (  4 JK    1 micro), CASSCF E = -14.6648878262754  dE = -1.24263897e-06  S^2 = 0.0000000
+               |grad[o]|=8.41e-05  |grad[c]|=0.00245  |ddm|=3.24e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 33 step=4237.352064 s cum_CASSCF=199795.050018 s E=-14.664887826275359 Er=1.685493e-04
+[MACRO_TIMING] ncas= 56 macro= 34 step=627.906051 s cum_CASSCF=200422.956069 s E=-14.664887826275359 Er=1.685493e-04
+macro iter  34 (  4 JK    1 micro), CASSCF E = -14.6648889465638  dE = -1.12028842e-06  S^2 = 0.0000000
+               |grad[o]|=8.63e-05  |grad[c]|=0.00279  |ddm|=9.08e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 34 step=4234.213187 s cum_CASSCF=204657.169256 s E=-14.664888946563780 Er=1.684730e-04
+[MACRO_TIMING] ncas= 56 macro= 35 step=628.183473 s cum_CASSCF=205285.352729 s E=-14.664888946563780 Er=1.684730e-04
+macro iter  35 (  4 JK    1 micro), CASSCF E = -14.6648899918639  dE = -1.04530014e-06  S^2 = 0.0000000
+               |grad[o]|=0.000133  |grad[c]|=0.00273  |ddm|=4.37e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 35 step=4230.352305 s cum_CASSCF=209515.705034 s E=-14.664889991863920 Er=1.684017e-04
+[MACRO_TIMING] ncas= 56 macro= 36 step=628.572563 s cum_CASSCF=210144.277597 s E=-14.664889991863920 Er=1.684017e-04
+macro iter  36 (  4 JK    1 micro), CASSCF E = -14.6648908591064  dE = -8.67242498e-07  S^2 = 0.0000000
+               |grad[o]|=0.000138  |grad[c]|=0.0027  |ddm|=8.77e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 36 step=4231.917739 s cum_CASSCF=214376.195336 s E=-14.664890859106418 Er=1.683426e-04
+[MACRO_TIMING] ncas= 56 macro= 37 step=628.501285 s cum_CASSCF=215004.696620 s E=-14.664890859106418 Er=1.683426e-04
+macro iter  37 (  4 JK    1 micro), CASSCF E = -14.6648916928550  dE = -8.33748576e-07  S^2 = 0.0000000
+               |grad[o]|=0.000172  |grad[c]|=0.00255  |ddm|=4.96e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 37 step=3804.258273 s cum_CASSCF=218808.954893 s E=-14.664891692854994 Er=1.682857e-04
+[MACRO_TIMING] ncas= 56 macro= 38 step=628.913344 s cum_CASSCF=219437.868237 s E=-14.664891692854994 Er=1.682857e-04
+macro iter  38 (  4 JK    1 micro), CASSCF E = -14.6648924510673  dE = -7.58212348e-07  S^2 = 0.0000000
+               |grad[o]|=0.000177  |grad[c]|=0.00275  |ddm|=8.18e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 38 step=3805.584313 s cum_CASSCF=223243.452550 s E=-14.664892451067342 Er=1.682340e-04
+[MACRO_TIMING] ncas= 56 macro= 39 step=628.141059 s cum_CASSCF=223871.593609 s E=-14.664892451067342 Er=1.682340e-04
+macro iter  39 (  4 JK    1 micro), CASSCF E = -14.6648932530690  dE = -8.02001635e-07  S^2 = 0.0000000
+               |grad[o]|=0.000198  |grad[c]|=0.0029  |ddm|=5.69e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 39 step=3805.297632 s cum_CASSCF=227676.891240 s E=-14.664893253068977 Er=1.681793e-04
+[MACRO_TIMING] ncas= 56 macro= 40 step=628.012124 s cum_CASSCF=228304.903365 s E=-14.664893253068977 Er=1.681793e-04
+macro iter  40 (  4 JK    1 micro), CASSCF E = -14.6648940232062  dE = -7.70137211e-07  S^2 = 0.0000000
+               |grad[o]|=0.000199  |grad[c]|=0.00326  |ddm|=8.21e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 40 step=3810.533419 s cum_CASSCF=232115.436784 s E=-14.664894023206188 Er=1.681268e-04
+[MACRO_TIMING] ncas= 56 macro= 41 step=628.299813 s cum_CASSCF=232743.736596 s E=-14.664894023206188 Er=1.681268e-04
+macro iter  41 (  4 JK    1 micro), CASSCF E = -14.6648948213593  dE = -7.98153160e-07  S^2 = 0.0000000
+               |grad[o]|=0.000212  |grad[c]|=0.00346  |ddm|=6.18e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 41 step=3911.190632 s cum_CASSCF=236654.927228 s E=-14.664894821359347 Er=1.680724e-04
+[MACRO_TIMING] ncas= 56 macro= 42 step=628.046590 s cum_CASSCF=237282.973818 s E=-14.664894821359347 Er=1.680724e-04
+macro iter  42 (  4 JK    1 micro), CASSCF E = -14.6648956371327  dE = -8.15773353e-07  S^2 = 0.0000000
+               |grad[o]|=0.000219  |grad[c]|=0.00374  |ddm|=8.64e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 42 step=4230.552008 s cum_CASSCF=241513.525826 s E=-14.664895637132700 Er=1.680168e-04
+[MACRO_TIMING] ncas= 56 macro= 43 step=628.019531 s cum_CASSCF=242141.545357 s E=-14.664895637132700 Er=1.680168e-04
+[MACRO_TIMING] ncas= 56 macro= 43 step=823.886969 s cum_CASSCF=242965.432326 s E=-14.664895637132700 Er=1.680168e-04
+macro iter  43 (  9 JK    2 micro), CASSCF E = -14.6648987152485  dE = -3.07811577e-06  S^2 = 0.0000000
+               |grad[o]|=0.000227  |grad[c]|=0.00418  |ddm|=1.77e-05  |maxRot[o]|=0.0498
+[MACRO_TIMING] ncas= 56 macro= 43 step=5205.276433 s cum_CASSCF=248170.708759 s E=-14.664898715248468 Er=1.678069e-04
+[MACRO_TIMING] ncas= 56 macro= 44 step=631.191345 s cum_CASSCF=248801.900104 s E=-14.664898715248468 Er=1.678069e-04
+macro iter  44 (  4 JK    1 micro), CASSCF E = -14.6648997507305  dE = -1.03548207e-06  S^2 = 0.0000000
+               |grad[o]|=0.000182  |grad[c]|=0.00585  |ddm|=1.9e-05  |maxRot[o]|=0.0156
+[MACRO_TIMING] ncas= 56 macro= 44 step=3593.652813 s cum_CASSCF=252395.552917 s E=-14.664899750730539 Er=1.677363e-04
+[MACRO_TIMING] ncas= 56 macro= 45 step=628.272543 s cum_CASSCF=253023.825460 s E=-14.664899750730539 Er=1.677363e-04
+macro iter  45 (  5 JK    1 micro), CASSCF E = -14.6649009330211  dE = -1.18229053e-06  S^2 = 0.0000000
+               |grad[o]|=0.000206  |grad[c]|=0.00643  |ddm|=6.25e-06  |maxRot[o]|=0.0267
+[MACRO_TIMING] ncas= 56 macro= 45 step=3698.157640 s cum_CASSCF=256721.983099 s E=-14.664900933021073 Er=1.676557e-04
+[MACRO_TIMING] ncas= 56 macro= 46 step=628.315293 s cum_CASSCF=257350.298392 s E=-14.664900933021073 Er=1.676557e-04
+macro iter  46 (  4 JK    1 micro), CASSCF E = -14.6649019534024  dE = -1.02038128e-06  S^2 = 0.0000000
+               |grad[o]|=0.000191  |grad[c]|=0.00537  |ddm|=1.27e-05  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 46 step=3487.303134 s cum_CASSCF=260837.601526 s E=-14.664901953402353 Er=1.675862e-04
+[MACRO_TIMING] ncas= 56 macro= 47 step=628.340921 s cum_CASSCF=261465.942447 s E=-14.664901953402353 Er=1.675862e-04
+macro iter  47 (  4 JK    1 micro), CASSCF E = -14.6649030930075  dE = -1.13960520e-06  S^2 = 0.0000000
+               |grad[o]|=0.000211  |grad[c]|=0.00563  |ddm|=4.47e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 47 step=3487.408463 s cum_CASSCF=264953.350910 s E=-14.664903093007549 Er=1.675085e-04
+[MACRO_TIMING] ncas= 56 macro= 48 step=628.208564 s cum_CASSCF=265581.559474 s E=-14.664903093007549 Er=1.675085e-04
+macro iter  48 (  4 JK    1 micro), CASSCF E = -14.6649042820884  dE = -1.18908088e-06  S^2 = 0.0000000
+               |grad[o]|=0.000177  |grad[c]|=0.00577  |ddm|=1.15e-05  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 48 step=3173.702167 s cum_CASSCF=268755.261641 s E=-14.664904282088425 Er=1.674274e-04
+[MACRO_TIMING] ncas= 56 macro= 49 step=633.683468 s cum_CASSCF=269388.945110 s E=-14.664904282088425 Er=1.674274e-04
+macro iter  49 (  4 JK    1 micro), CASSCF E = -14.6649054290259  dE = -1.14693748e-06  S^2 = 0.0000000
+               |grad[o]|=0.000184  |grad[c]|=0.00455  |ddm|=3.13e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 49 step=3014.530575 s cum_CASSCF=272403.475684 s E=-14.664905429025902 Er=1.673492e-04
+[MACRO_TIMING] ncas= 56 macro= 50 step=763.452186 s cum_CASSCF=273166.927870 s E=-14.664905429025902 Er=1.673492e-04
+macro iter  50 (  4 JK    1 micro), CASSCF E = -14.6649065698114  dE = -1.14078549e-06  S^2 = 0.0000000
+               |grad[o]|=0.000175  |grad[c]|=0.00422  |ddm|=5.05e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 50 step=3006.595931 s cum_CASSCF=276173.523801 s E=-14.664906569811395 Er=1.672714e-04
+[MACRO_TIMING] ncas= 56 macro= 51 step=652.169459 s cum_CASSCF=276825.693259 s E=-14.664906569811395 Er=1.672714e-04
+macro iter  51 (  5 JK    1 micro), CASSCF E = -14.6649089747755  dE = -2.40496410e-06  S^2 = 0.0000000
+               |grad[o]|=0.000176  |grad[c]|=0.00749  |ddm|=9.8e-06  |maxRot[o]|= 0.04
+[MACRO_TIMING] ncas= 56 macro= 51 step=4053.782789 s cum_CASSCF=280879.476048 s E=-14.664908974775495 Er=1.671075e-04
+[MACRO_TIMING] ncas= 56 macro= 52 step=649.058556 s cum_CASSCF=281528.534604 s E=-14.664908974775495 Er=1.671075e-04
+macro iter  52 (  5 JK    1 micro), CASSCF E = -14.6649118266682  dE = -2.85189266e-06  S^2 = 0.0000000
+               |grad[o]|=0.000148  |grad[c]|=0.00684  |ddm|=8.7e-06  |maxRot[o]|= 0.04
+[MACRO_TIMING] ncas= 56 macro= 52 step=5190.014205 s cum_CASSCF=286718.548809 s E=-14.664911826668151 Er=1.669130e-04
+[MACRO_TIMING] ncas= 56 macro= 53 step=647.385034 s cum_CASSCF=287365.933843 s E=-14.664911826668151 Er=1.669130e-04
+macro iter  53 (  5 JK    1 micro), CASSCF E = -14.6649138452562  dE = -2.01858802e-06  S^2 = 0.0000000
+               |grad[o]|=0.000179  |grad[c]|=0.00649  |ddm|=7.32e-06  |maxRot[o]|=0.0398
+[MACRO_TIMING] ncas= 56 macro= 53 step=5597.213604 s cum_CASSCF=292963.147447 s E=-14.664913845256168 Er=1.667754e-04
+[MACRO_TIMING] ncas= 56 macro= 54 step=686.687163 s cum_CASSCF=293649.834611 s E=-14.664913845256168 Er=1.667754e-04
+macro iter  54 (  5 JK    1 micro), CASSCF E = -14.6649157531358  dE = -1.90787965e-06  S^2 = 0.0000000
+               |grad[o]|=0.000201  |grad[c]|=0.0055  |ddm|=5.51e-06  |maxRot[o]|=0.0394
+[MACRO_TIMING] ncas= 56 macro= 54 step=5516.159092 s cum_CASSCF=299165.993703 s E=-14.664915753135817 Er=1.666453e-04
+[MACRO_TIMING] ncas= 56 macro= 55 step=670.834659 s cum_CASSCF=299836.828362 s E=-14.664915753135817 Er=1.666453e-04
+[MACRO_TIMING] ncas= 56 macro= 55 step=898.270313 s cum_CASSCF=300735.098675 s E=-14.664915753135817 Er=1.666453e-04
+macro iter  55 ( 11 JK    2 micro), CASSCF E = -14.6649200373051  dE = -4.28416926e-06  S^2 = 0.0000000
+               |grad[o]|=0.000218  |grad[c]|=0.00335  |ddm|=1.96e-05  |maxRot[o]|=0.0863
+[MACRO_TIMING] ncas= 56 macro= 55 step=5859.729316 s cum_CASSCF=306594.827991 s E=-14.664920037305082 Er=1.663532e-04
+[MACRO_TIMING] ncas= 56 macro= 56 step=643.131103 s cum_CASSCF=307237.959094 s E=-14.664920037305082 Er=1.663532e-04
+[MACRO_TIMING] ncas= 56 macro= 56 step=866.296541 s cum_CASSCF=308104.255635 s E=-14.664920037305082 Er=1.663532e-04
+macro iter  56 (  9 JK    2 micro), CASSCF E = -14.6649214583956  dE = -1.42109051e-06  S^2 = 0.0000000
+               |grad[o]|=0.000232  |grad[c]|=0.00169  |ddm|=1.47e-05  |maxRot[o]|=0.0498
+[MACRO_TIMING] ncas= 56 macro= 56 step=5833.647473 s cum_CASSCF=313937.903108 s E=-14.664921458395590 Er=1.662563e-04
+[MACRO_TIMING] ncas= 56 macro= 57 step=673.853585 s cum_CASSCF=314611.756693 s E=-14.664921458395590 Er=1.662563e-04
+[MACRO_TIMING] ncas= 56 macro= 57 step=895.932877 s cum_CASSCF=315507.689570 s E=-14.664921458395590 Er=1.662563e-04
+[MACRO_TIMING] ncas= 56 macro= 57 step=863.327121 s cum_CASSCF=316371.016691 s E=-14.664921458395590 Er=1.662563e-04
+macro iter  57 ( 21 JK    4 micro), CASSCF E = -14.6649229005608  dE = -1.44216520e-06  S^2 = 0.0000000
+               |grad[o]|=0.000123  |grad[c]|=0.00188  |ddm|=1.8e-05  |maxRot[o]|=0.0315
+[MACRO_TIMING] ncas= 56 macro= 57 step=6215.555141 s cum_CASSCF=322586.571833 s E=-14.664922900560789 Er=1.661580e-04
+[MACRO_TIMING] ncas= 56 macro= 58 step=682.784149 s cum_CASSCF=323269.355981 s E=-14.664922900560789 Er=1.661580e-04
+[MACRO_TIMING] ncas= 56 macro= 58 step=887.484698 s cum_CASSCF=324156.840680 s E=-14.664922900560789 Er=1.661580e-04
+[MACRO_TIMING] ncas= 56 macro= 58 step=872.590021 s cum_CASSCF=325029.430701 s E=-14.664922900560789 Er=1.661580e-04
+macro iter  58 ( 21 JK    4 micro), CASSCF E = -14.6649251107475  dE = -2.21018668e-06  S^2 = 0.0000000
+               |grad[o]|=0.000165  |grad[c]|=0.00268  |ddm|=1.86e-05  |maxRot[o]|=0.0897
+[MACRO_TIMING] ncas= 56 macro= 58 step=6533.490602 s cum_CASSCF=331562.921302 s E=-14.664925110747474 Er=1.660073e-04
+[MACRO_TIMING] ncas= 56 macro= 59 step=670.625497 s cum_CASSCF=332233.546799 s E=-14.664925110747474 Er=1.660073e-04
+[MACRO_TIMING] ncas= 56 macro= 59 step=900.202822 s cum_CASSCF=333133.749621 s E=-14.664925110747474 Er=1.660073e-04
+[MACRO_TIMING] ncas= 56 macro= 59 step=887.230499 s cum_CASSCF=334020.980120 s E=-14.664925110747474 Er=1.660073e-04
+macro iter  59 ( 21 JK    4 micro), CASSCF E = -14.6649260726787  dE = -9.61931214e-07  S^2 = 0.0000000
+               |grad[o]|=0.000155  |grad[c]|=0.0013  |ddm|=5.2e-06  |maxRot[o]|=0.0645
+[MACRO_TIMING] ncas= 56 macro= 59 step=6274.795746 s cum_CASSCF=340295.775866 s E=-14.664926072678687 Er=1.659417e-04
+[MACRO_TIMING] ncas= 56 macro= 60 step=769.568553 s cum_CASSCF=341065.344419 s E=-14.664926072678687 Er=1.659417e-04
+[MACRO_TIMING] ncas= 56 macro= 60 step=909.412933 s cum_CASSCF=341974.757352 s E=-14.664926072678687 Er=1.659417e-04
+[MACRO_TIMING] ncas= 56 macro= 60 step=896.751311 s cum_CASSCF=342871.508663 s E=-14.664926072678687 Er=1.659417e-04
+macro iter  60 ( 21 JK    4 micro), CASSCF E = -14.6649266306078  dE = -5.57929161e-07  S^2 = 0.0000000
+               |grad[o]|=0.000153  |grad[c]|=0.000853  |ddm|=5.38e-06  |maxRot[o]|=0.0468
+[MACRO_TIMING] ncas= 56 macro= 60 step=6159.650267 s cum_CASSCF=349031.158930 s E=-14.664926630607848 Er=1.659037e-04
+[MACRO_TIMING] ncas= 56 macro= 61 step=695.098344 s cum_CASSCF=349726.257275 s E=-14.664926630607848 Er=1.659037e-04
+[MACRO_TIMING] ncas= 56 macro= 61 step=865.314288 s cum_CASSCF=350591.571562 s E=-14.664926630607848 Er=1.659037e-04
+[MACRO_TIMING] ncas= 56 macro= 61 step=875.865104 s cum_CASSCF=351467.436667 s E=-14.664926630607848 Er=1.659037e-04
+macro iter  61 ( 21 JK    4 micro), CASSCF E = -14.6649269486783  dE = -3.18070420e-07  S^2 = 0.0000000
+               |grad[o]|=0.000109  |grad[c]|=0.000646  |ddm|=4.35e-06  |maxRot[o]|=0.0367
+[MACRO_TIMING] ncas= 56 macro= 61 step=4945.304135 s cum_CASSCF=356412.740802 s E=-14.664926948678268 Er=1.658820e-04
+[MACRO_TIMING] ncas= 56 macro= 62 step=740.086108 s cum_CASSCF=357152.826910 s E=-14.664926948678268 Er=1.658820e-04
+[MACRO_TIMING] ncas= 56 macro= 62 step=911.220867 s cum_CASSCF=358064.047777 s E=-14.664926948678268 Er=1.658820e-04
+[MACRO_TIMING] ncas= 56 macro= 62 step=886.762617 s cum_CASSCF=358950.810393 s E=-14.664926948678268 Er=1.658820e-04
+macro iter  62 ( 21 JK    4 micro), CASSCF E = -14.6649272111572  dE = -2.62478890e-07  S^2 = 0.0000000
+               |grad[o]|=9.62e-05  |grad[c]|=0.000602  |ddm|=3.75e-06  |maxRot[o]|=0.0408
+[MACRO_TIMING] ncas= 56 macro= 62 step=4450.340112 s cum_CASSCF=363401.150505 s E=-14.664927211157158 Er=1.658641e-04
+[MACRO_TIMING] ncas= 56 macro= 63 step=702.416618 s cum_CASSCF=364103.567123 s E=-14.664927211157158 Er=1.658641e-04
+[MACRO_TIMING] ncas= 56 macro= 63 step=954.272815 s cum_CASSCF=365057.839938 s E=-14.664927211157158 Er=1.658641e-04
+[MACRO_TIMING] ncas= 56 macro= 63 step=893.376984 s cum_CASSCF=365951.216923 s E=-14.664927211157158 Er=1.658641e-04
+macro iter  63 ( 21 JK    4 micro), CASSCF E = -14.6649273035917  dE = -9.24345560e-08  S^2 = 0.0000000
+               |grad[o]|=5.09e-05  |grad[c]|=0.000312  |ddm|=1.6e-06  |maxRot[o]|=0.0165
+[MACRO_TIMING] ncas= 56 macro= 63 step=3529.852641 s cum_CASSCF=369481.069563 s E=-14.664927303591714 Er=1.658578e-04
+[MACRO_TIMING] ncas= 56 macro= 64 step=697.302415 s cum_CASSCF=370178.371979 s E=-14.664927303591714 Er=1.658578e-04
+[MACRO_TIMING] ncas= 56 macro= 64 step=883.471540 s cum_CASSCF=371061.843519 s E=-14.664927303591714 Er=1.658578e-04
+[MACRO_TIMING] ncas= 56 macro= 64 step=881.124943 s cum_CASSCF=371942.968462 s E=-14.664927303591714 Er=1.658578e-04
+macro iter  64 ( 21 JK    4 micro), CASSCF E = -14.6649274010950  dE = -9.75032837e-08  S^2 = 0.0000000
+               |grad[o]|=4.42e-05  |grad[c]|=0.000308  |ddm|=1.86e-06  |maxRot[o]|=0.0225
+[MACRO_TIMING] ncas= 56 macro= 64 step=4093.221069 s cum_CASSCF=376036.189531 s E=-14.664927401094998 Er=1.658512e-04
+[MACRO_TIMING] ncas= 56 macro= 65 step=655.853436 s cum_CASSCF=376692.042967 s E=-14.664927401094998 Er=1.658512e-04
+[MACRO_TIMING] ncas= 56 macro= 65 step=867.034131 s cum_CASSCF=377559.077098 s E=-14.664927401094998 Er=1.658512e-04
+[MACRO_TIMING] ncas= 56 macro= 65 step=850.400253 s cum_CASSCF=378409.477351 s E=-14.664927401094998 Er=1.658512e-04
+macro iter  65 ( 21 JK    4 micro), CASSCF E = -14.6649275200074  dE = -1.18912370e-07  S^2 = 0.0000000
+               |grad[o]|=6.15e-05  |grad[c]|=0.000358  |ddm|=3.16e-06  |maxRot[o]|=0.0298
+[MACRO_TIMING] ncas= 56 macro= 65 step=4095.310070 s cum_CASSCF=382504.787421 s E=-14.664927520007367 Er=1.658431e-04
+[MACRO_TIMING] ncas= 56 macro= 66 step=663.071221 s cum_CASSCF=383167.858642 s E=-14.664927520007367 Er=1.658431e-04
+[MACRO_TIMING] ncas= 56 macro= 66 step=838.053648 s cum_CASSCF=384005.912290 s E=-14.664927520007367 Er=1.658431e-04
+[MACRO_TIMING] ncas= 56 macro= 66 step=866.791780 s cum_CASSCF=384872.704071 s E=-14.664927520007367 Er=1.658431e-04
+macro iter  66 ( 21 JK    4 micro), CASSCF E = -14.6649276126597  dE = -9.26523054e-08  S^2 = 0.0000000
+               |grad[o]|=4.52e-05  |grad[c]|=0.000297  |ddm|=2.86e-06  |maxRot[o]|=0.0254
+[MACRO_TIMING] ncas= 56 macro= 66 step=4094.886555 s cum_CASSCF=388967.590625 s E=-14.664927612659673 Er=1.658368e-04
+[MACRO_TIMING] ncas= 56 macro= 67 step=651.414033 s cum_CASSCF=389619.004659 s E=-14.664927612659673 Er=1.658368e-04
+[MACRO_TIMING] ncas= 56 macro= 67 step=834.753901 s cum_CASSCF=390453.758560 s E=-14.664927612659673 Er=1.658368e-04
+[MACRO_TIMING] ncas= 56 macro= 67 step=830.710457 s cum_CASSCF=391284.469016 s E=-14.664927612659673 Er=1.658368e-04
+macro iter  67 ( 21 JK    4 micro), CASSCF E = -14.6649279321046  dE = -3.19444940e-07  S^2 = 0.0000000
+               |grad[o]|=5.44e-05  |grad[c]|=0.000697  |ddm|=3.96e-06  |maxRot[o]|=0.0823
+[MACRO_TIMING] ncas= 56 macro= 67 step=5119.784242 s cum_CASSCF=396404.253259 s E=-14.664927932104613 Er=1.658150e-04
+[MACRO_TIMING] ncas= 56 macro= 68 step=632.318270 s cum_CASSCF=397036.571529 s E=-14.664927932104613 Er=1.658150e-04
+[MACRO_TIMING] ncas= 56 macro= 68 step=829.857158 s cum_CASSCF=397866.428687 s E=-14.664927932104613 Er=1.658150e-04
+[MACRO_TIMING] ncas= 56 macro= 68 step=842.548613 s cum_CASSCF=398708.977300 s E=-14.664927932104613 Er=1.658150e-04
+macro iter  68 ( 21 JK    4 micro), CASSCF E = -14.6649283927497  dE = -4.60645094e-07  S^2 = 0.0000000
+               |grad[o]|=6.52e-05  |grad[c]|=0.000891  |ddm|=4.35e-06  |maxRot[o]|=0.114
+[MACRO_TIMING] ncas= 56 macro= 68 step=5374.047929 s cum_CASSCF=404083.025229 s E=-14.664928392749706 Er=1.657836e-04
+[MACRO_TIMING] ncas= 56 macro= 69 step=694.189147 s cum_CASSCF=404777.214375 s E=-14.664928392749706 Er=1.657836e-04
+[MACRO_TIMING] ncas= 56 macro= 69 step=859.538643 s cum_CASSCF=405636.753018 s E=-14.664928392749706 Er=1.657836e-04
+[MACRO_TIMING] ncas= 56 macro= 69 step=911.484273 s cum_CASSCF=406548.237291 s E=-14.664928392749706 Er=1.657836e-04
+macro iter  69 ( 21 JK    4 micro), CASSCF E = -14.6649289421039  dE = -5.49354159e-07  S^2 = 0.0000000
+               |grad[o]|=9.03e-05  |grad[c]|=0.00102  |ddm|=4.92e-06  |maxRot[o]|=0.129
+[MACRO_TIMING] ncas= 56 macro= 69 step=5136.174057 s cum_CASSCF=411684.411348 s E=-14.664928942103865 Er=1.657461e-04
+[MACRO_TIMING] ncas= 56 macro= 70 step=696.659097 s cum_CASSCF=412381.070445 s E=-14.664928942103865 Er=1.657461e-04
+[MACRO_TIMING] ncas= 56 macro= 70 step=852.792176 s cum_CASSCF=413233.862622 s E=-14.664928942103865 Er=1.657461e-04
+[MACRO_TIMING] ncas= 56 macro= 70 step=847.174002 s cum_CASSCF=414081.036624 s E=-14.664928942103865 Er=1.657461e-04
+macro iter  70 ( 21 JK    4 micro), CASSCF E = -14.6649294648615  dE = -5.22757604e-07  S^2 = 0.0000000
+               |grad[o]|=9.19e-05  |grad[c]|=0.00071  |ddm|=3.9e-06  |maxRot[o]|=0.103
+[MACRO_TIMING] ncas= 56 macro= 70 step=4767.782903 s cum_CASSCF=418848.819527 s E=-14.664929464861469 Er=1.657105e-04
+[MACRO_TIMING] ncas= 56 macro= 71 step=672.834187 s cum_CASSCF=419521.653714 s E=-14.664929464861469 Er=1.657105e-04
+[MACRO_TIMING] ncas= 56 macro= 71 step=927.266794 s cum_CASSCF=420448.920508 s E=-14.664929464861469 Er=1.657105e-04
+[MACRO_TIMING] ncas= 56 macro= 71 step=839.143636 s cum_CASSCF=421288.064144 s E=-14.664929464861469 Er=1.657105e-04
+macro iter  71 ( 21 JK    4 micro), CASSCF E = -14.6649298126701  dE = -3.47808600e-07  S^2 = 0.0000000
+               |grad[o]|=7.19e-05  |grad[c]|=0.000578  |ddm|=2.51e-06  |maxRot[o]|=0.0527
+[MACRO_TIMING] ncas= 56 macro= 71 step=4762.255861 s cum_CASSCF=426050.320005 s E=-14.664929812670069 Er=1.656868e-04
+[MACRO_TIMING] ncas= 56 macro= 72 step=632.023265 s cum_CASSCF=426682.343271 s E=-14.664929812670069 Er=1.656868e-04
+[MACRO_TIMING] ncas= 56 macro= 72 step=830.632608 s cum_CASSCF=427512.975878 s E=-14.664929812670069 Er=1.656868e-04
+[MACRO_TIMING] ncas= 56 macro= 72 step=827.994894 s cum_CASSCF=428340.970772 s E=-14.664929812670069 Er=1.656868e-04
+macro iter  72 ( 21 JK    4 micro), CASSCF E = -14.6649300937392  dE = -2.81069168e-07  S^2 = 0.0000000
+               |grad[o]|=5.91e-05  |grad[c]|=0.000541  |ddm|=2.52e-06  |maxRot[o]|=0.0415
+[MACRO_TIMING] ncas= 56 macro= 72 step=4456.319935 s cum_CASSCF=432797.290706 s E=-14.664930093739237 Er=1.656676e-04
+[MACRO_TIMING] ncas= 56 macro= 73 step=633.703696 s cum_CASSCF=433430.994402 s E=-14.664930093739237 Er=1.656676e-04
+[MACRO_TIMING] ncas= 56 macro= 73 step=829.321415 s cum_CASSCF=434260.315817 s E=-14.664930093739237 Er=1.656676e-04
+[MACRO_TIMING] ncas= 56 macro= 73 step=829.750831 s cum_CASSCF=435090.066649 s E=-14.664930093739237 Er=1.656676e-04
+macro iter  73 ( 21 JK    4 micro), CASSCF E = -14.6649303273982  dE = -2.33659005e-07  S^2 = 0.0000000
+               |grad[o]|=5.67e-05  |grad[c]|=0.000509  |ddm|=2.14e-06  |maxRot[o]|=0.0369
+[MACRO_TIMING] ncas= 56 macro= 73 step=4465.946462 s cum_CASSCF=439556.013110 s E=-14.664930327398242 Er=1.656517e-04
+[MACRO_TIMING] ncas= 56 macro= 74 step=633.669973 s cum_CASSCF=440189.683083 s E=-14.664930327398242 Er=1.656517e-04
+[MACRO_TIMING] ncas= 56 macro= 74 step=832.693800 s cum_CASSCF=441022.376883 s E=-14.664930327398242 Er=1.656517e-04
+[MACRO_TIMING] ncas= 56 macro= 74 step=828.701475 s cum_CASSCF=441851.078358 s E=-14.664930327398242 Er=1.656517e-04
+macro iter  74 ( 21 JK    4 micro), CASSCF E = -14.6649306495952  dE = -3.22196959e-07  S^2 = 0.0000000
+               |grad[o]|=6.17e-05  |grad[c]|=0.000742  |ddm|=2.89e-06  |maxRot[o]|=0.0509
+[MACRO_TIMING] ncas= 56 macro= 74 step=4778.038376 s cum_CASSCF=446629.116734 s E=-14.664930649595201 Er=1.656297e-04
+[MACRO_TIMING] ncas= 56 macro= 75 step=642.863029 s cum_CASSCF=447271.979763 s E=-14.664930649595201 Er=1.656297e-04
+[MACRO_TIMING] ncas= 56 macro= 75 step=834.449686 s cum_CASSCF=448106.429449 s E=-14.664930649595201 Er=1.656297e-04
+[MACRO_TIMING] ncas= 56 macro= 75 step=830.745641 s cum_CASSCF=448937.175090 s E=-14.664930649595201 Er=1.656297e-04
+macro iter  75 ( 21 JK    4 micro), CASSCF E = -14.6649310055802  dE = -3.55985046e-07  S^2 = 0.0000000
+               |grad[o]|=6.88e-05  |grad[c]|=0.00087  |ddm|=2.89e-06  |maxRot[o]|=0.0537
+[MACRO_TIMING] ncas= 56 macro= 75 step=5326.819252 s cum_CASSCF=454263.994342 s E=-14.664931005580247 Er=1.656054e-04
+[MACRO_TIMING] ncas= 56 macro= 76 step=631.655463 s cum_CASSCF=454895.649805 s E=-14.664931005580247 Er=1.656054e-04
+[MACRO_TIMING] ncas= 56 macro= 76 step=829.303422 s cum_CASSCF=455724.953228 s E=-14.664931005580247 Er=1.656054e-04
+[MACRO_TIMING] ncas= 56 macro= 76 step=828.278524 s cum_CASSCF=456553.231752 s E=-14.664931005580247 Er=1.656054e-04
+macro iter  76 ( 21 JK    4 micro), CASSCF E = -14.6649314826203  dE = -4.77040036e-07  S^2 = 0.0000000
+               |grad[o]|=6.28e-05  |grad[c]|=0.0011  |ddm|=3.45e-06  |maxRot[o]|=0.0612
+[MACRO_TIMING] ncas= 56 macro= 76 step=5750.894293 s cum_CASSCF=462304.126045 s E=-14.664931482620283 Er=1.655729e-04
+[MACRO_TIMING] ncas= 56 macro= 77 step=630.061129 s cum_CASSCF=462934.187174 s E=-14.664931482620283 Er=1.655729e-04
+[MACRO_TIMING] ncas= 56 macro= 77 step=826.552151 s cum_CASSCF=463760.739326 s E=-14.664931482620283 Er=1.655729e-04
+[MACRO_TIMING] ncas= 56 macro= 77 step=830.325424 s cum_CASSCF=464591.064749 s E=-14.664931482620283 Er=1.655729e-04
+macro iter  77 ( 21 JK    4 micro), CASSCF E = -14.6649320554508  dE = -5.72830542e-07  S^2 = 0.0000000
+               |grad[o]|=7.69e-05  |grad[c]|=0.00118  |ddm|=3.6e-06  |maxRot[o]|=0.0566
+[MACRO_TIMING] ncas= 56 macro= 77 step=5722.224525 s cum_CASSCF=470313.289274 s E=-14.664932055450825 Er=1.655338e-04
+[MACRO_TIMING] ncas= 56 macro= 78 step=630.855840 s cum_CASSCF=470944.145114 s E=-14.664932055450825 Er=1.655338e-04
+[MACRO_TIMING] ncas= 56 macro= 78 step=829.705828 s cum_CASSCF=471773.850942 s E=-14.664932055450825 Er=1.655338e-04
+[MACRO_TIMING] ncas= 56 macro= 78 step=826.336840 s cum_CASSCF=472600.187782 s E=-14.664932055450825 Er=1.655338e-04
+macro iter  78 ( 21 JK    4 micro), CASSCF E = -14.6649328293063  dE = -7.73855517e-07  S^2 = 0.0000000
+               |grad[o]|=0.000112  |grad[c]|=0.0019  |ddm|=3.83e-06  |maxRot[o]|=0.0748
+[MACRO_TIMING] ncas= 56 macro= 78 step=5720.730113 s cum_CASSCF=478320.917895 s E=-14.664932829306341 Er=1.654811e-04
+[MACRO_TIMING] ncas= 56 macro= 79 step=629.598018 s cum_CASSCF=478950.515913 s E=-14.664932829306341 Er=1.654811e-04
+[MACRO_TIMING] ncas= 56 macro= 79 step=825.471607 s cum_CASSCF=479775.987520 s E=-14.664932829306341 Er=1.654811e-04
+[MACRO_TIMING] ncas= 56 macro= 79 step=824.482993 s cum_CASSCF=480600.470513 s E=-14.664932829306341 Er=1.654811e-04
+macro iter  79 ( 21 JK    4 micro), CASSCF E = -14.6649383287103  dE = -5.49940396e-06  S^2 = 0.0000000
+               |grad[o]|=9.43e-05  |grad[c]|=0.00802  |ddm|=8.23e-06  |maxRot[o]|=0.148
+[MACRO_TIMING] ncas= 56 macro= 79 step=5702.668030 s cum_CASSCF=486303.138543 s E=-14.664938328710305 Er=1.651061e-04
+[MACRO_TIMING] ncas= 56 macro= 80 step=629.393112 s cum_CASSCF=486932.531655 s E=-14.664938328710305 Er=1.651061e-04
+[MACRO_TIMING] ncas= 56 macro= 80 step=824.202029 s cum_CASSCF=487756.733685 s E=-14.664938328710305 Er=1.651061e-04
+[MACRO_TIMING] ncas= 56 macro= 80 step=824.235635 s cum_CASSCF=488580.969319 s E=-14.664938328710305 Er=1.651061e-04
+macro iter  80 ( 21 JK    4 micro), CASSCF E = -14.6649690132824  dE = -3.06845721e-05  S^2 = 0.0000000
+               |grad[o]|=0.000167  |grad[c]|=0.024  |ddm|=1.14e-05  |maxRot[o]|=0.184
+[MACRO_TIMING] ncas= 56 macro= 80 step=5705.230049 s cum_CASSCF=494286.199368 s E=-14.664969013282414 Er=1.630141e-04
+[MACRO_TIMING] ncas= 56 macro= 81 step=628.637709 s cum_CASSCF=494914.837077 s E=-14.664969013282414 Er=1.630141e-04
+macro iter  81 (  4 JK    1 micro), CASSCF E = -14.6649708986877  dE = -1.88540527e-06  S^2 = 0.0000000
+               |grad[o]|=0.000202  |grad[c]|=0.00486  |ddm|=8.15e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 81 step=4454.666051 s cum_CASSCF=499369.503128 s E=-14.664970898687685 Er=1.628856e-04
+[MACRO_TIMING] ncas= 56 macro= 82 step=631.052424 s cum_CASSCF=500000.555552 s E=-14.664970898687685 Er=1.628856e-04
+[MACRO_TIMING] ncas= 56 macro= 82 step=825.208307 s cum_CASSCF=500825.763859 s E=-14.664970898687685 Er=1.628856e-04
+[MACRO_TIMING] ncas= 56 macro= 82 step=825.403115 s cum_CASSCF=501651.166974 s E=-14.664970898687685 Er=1.628856e-04
+macro iter  82 ( 21 JK    4 micro), CASSCF E = -14.6649794578171  dE = -8.55912940e-06  S^2 = 0.0000000
+               |grad[o]|=0.000155  |grad[c]|=0.00528  |ddm|=1.33e-05  |maxRot[o]|=0.157
+[MACRO_TIMING] ncas= 56 macro= 82 step=5718.745859 s cum_CASSCF=507369.912833 s E=-14.664979457817084 Er=1.623020e-04
+[MACRO_TIMING] ncas= 56 macro= 83 step=629.380989 s cum_CASSCF=507999.293822 s E=-14.664979457817084 Er=1.623020e-04
+macro iter  83 (  4 JK    1 micro), CASSCF E = -14.6649809082156  dE = -1.45039849e-06  S^2 = 0.0000000
+               |grad[o]|=0.000142  |grad[c]|=0.00703  |ddm|=1.99e-05  |maxRot[o]|=0.0156
+[MACRO_TIMING] ncas= 56 macro= 83 step=4340.563326 s cum_CASSCF=512339.857148 s E=-14.664980908215576 Er=1.622031e-04
+[MACRO_TIMING] ncas= 56 macro= 84 step=628.683846 s cum_CASSCF=512968.540994 s E=-14.664980908215576 Er=1.622031e-04
+macro iter  84 (  4 JK    1 micro), CASSCF E = -14.6649827518765  dE = -1.84366093e-06  S^2 = 0.0000000
+               |grad[o]|=0.000169  |grad[c]|=0.0079  |ddm|=5.61e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 84 step=4897.909743 s cum_CASSCF=517866.450737 s E=-14.664982751876510 Er=1.620774e-04
+[MACRO_TIMING] ncas= 56 macro= 85 step=631.057540 s cum_CASSCF=518497.508277 s E=-14.664982751876510 Er=1.620774e-04
+macro iter  85 (  4 JK    1 micro), CASSCF E = -14.6649846920341  dE = -1.94015756e-06  S^2 = 0.0000000
+               |grad[o]|=0.000164  |grad[c]|=0.00818  |ddm|=2.27e-05  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 85 step=4779.593289 s cum_CASSCF=523277.101566 s E=-14.664984692034071 Er=1.619452e-04
+[MACRO_TIMING] ncas= 56 macro= 86 step=633.289248 s cum_CASSCF=523910.390814 s E=-14.664984692034071 Er=1.619452e-04
+macro iter  86 (  4 JK    1 micro), CASSCF E = -14.6649864064268  dE = -1.71439271e-06  S^2 = 0.0000000
+               |grad[o]|=0.000183  |grad[c]|=0.0067  |ddm|=5.85e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 86 step=4358.099380 s cum_CASSCF=528268.490194 s E=-14.664986406426785 Er=1.618283e-04
+[MACRO_TIMING] ncas= 56 macro= 87 step=628.642181 s cum_CASSCF=528897.132374 s E=-14.664986406426785 Er=1.618283e-04
+macro iter  87 (  4 JK    1 micro), CASSCF E = -14.6649879113232  dE = -1.50489644e-06  S^2 = 0.0000000
+               |grad[o]|=0.000146  |grad[c]|=0.00611  |ddm|=3.69e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 87 step=4251.862524 s cum_CASSCF=533148.994898 s E=-14.664987911323223 Er=1.617257e-04
+[MACRO_TIMING] ncas= 56 macro= 88 step=629.375203 s cum_CASSCF=533778.370102 s E=-14.664987911323223 Er=1.617257e-04
+macro iter  88 (  5 JK    1 micro), CASSCF E = -14.6649907248397  dE = -2.81351653e-06  S^2 = 0.0000000
+               |grad[o]|=0.000148  |grad[c]|=0.0111  |ddm|=9.47e-06  |maxRot[o]|=0.0318
+[MACRO_TIMING] ncas= 56 macro= 88 step=4342.737453 s cum_CASSCF=538121.107555 s E=-14.664990724839749 Er=1.615339e-04
+[MACRO_TIMING] ncas= 56 macro= 89 step=629.553926 s cum_CASSCF=538750.661480 s E=-14.664990724839749 Er=1.615339e-04
+macro iter  89 (  4 JK    1 micro), CASSCF E = -14.6649925485698  dE = -1.82373003e-06  S^2 = 0.0000000
+               |grad[o]|=0.000151  |grad[c]|=0.00662  |ddm|=1.1e-05  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 89 step=4236.307928 s cum_CASSCF=542986.969408 s E=-14.664992548569774 Er=1.614095e-04
+[MACRO_TIMING] ncas= 56 macro= 90 step=628.530606 s cum_CASSCF=543615.500014 s E=-14.664992548569774 Er=1.614095e-04
+macro iter  90 (  5 JK    1 micro), CASSCF E = -14.6649950762727  dE = -2.52770291e-06  S^2 = 0.0000000
+               |grad[o]|=0.000214  |grad[c]|=0.00902  |ddm|=2.57e-06  |maxRot[o]|=0.0399
+[MACRO_TIMING] ncas= 56 macro= 90 step=4237.395784 s cum_CASSCF=547852.895798 s E=-14.664995076272680 Er=1.612372e-04
+[MACRO_TIMING] ncas= 56 macro= 91 step=632.292077 s cum_CASSCF=548485.187875 s E=-14.664995076272680 Er=1.612372e-04
+[MACRO_TIMING] ncas= 56 macro= 91 step=825.290456 s cum_CASSCF=549310.478331 s E=-14.664995076272680 Er=1.612372e-04
+[MACRO_TIMING] ncas= 56 macro= 91 step=824.541685 s cum_CASSCF=550135.020016 s E=-14.664995076272680 Er=1.612372e-04
+macro iter  91 ( 21 JK    4 micro), CASSCF E = -14.6649989908542  dE = -3.91458153e-06  S^2 = 0.0000000
+               |grad[o]|=0.00018  |grad[c]|=0.00249  |ddm|=1.2e-05  |maxRot[o]|=0.0823
+[MACRO_TIMING] ncas= 56 macro= 91 step=5512.849394 s cum_CASSCF=555647.869409 s E=-14.664998990854206 Er=1.609703e-04
+[MACRO_TIMING] ncas= 56 macro= 92 step=628.346986 s cum_CASSCF=556276.216395 s E=-14.664998990854206 Er=1.609703e-04
+[MACRO_TIMING] ncas= 56 macro= 92 step=825.411559 s cum_CASSCF=557101.627954 s E=-14.664998990854206 Er=1.609703e-04
+[MACRO_TIMING] ncas= 56 macro= 92 step=824.268204 s cum_CASSCF=557925.896158 s E=-14.664998990854206 Er=1.609703e-04
+macro iter  92 ( 21 JK    4 micro), CASSCF E = -14.6650003031432  dE = -1.31228898e-06  S^2 = 0.0000000
+               |grad[o]|=0.000177  |grad[c]|=0.0025  |ddm|=7.27e-06  |maxRot[o]|=0.0514
+[MACRO_TIMING] ncas= 56 macro= 92 step=5171.553414 s cum_CASSCF=563097.449571 s E=-14.665000303143188 Er=1.608808e-04
+[MACRO_TIMING] ncas= 56 macro= 93 step=628.215147 s cum_CASSCF=563725.664719 s E=-14.665000303143188 Er=1.608808e-04
+[MACRO_TIMING] ncas= 56 macro= 93 step=825.055061 s cum_CASSCF=564550.719779 s E=-14.665000303143188 Er=1.608808e-04
+[MACRO_TIMING] ncas= 56 macro= 93 step=824.324467 s cum_CASSCF=565375.044246 s E=-14.665000303143188 Er=1.608808e-04
+macro iter  93 ( 21 JK    4 micro), CASSCF E = -14.6650008948868  dE = -5.91743628e-07  S^2 = 0.0000000
+               |grad[o]|=0.000111  |grad[c]|=0.00211  |ddm|=6.26e-06  |maxRot[o]|=0.0696
+[MACRO_TIMING] ncas= 56 macro= 93 step=5282.265123 s cum_CASSCF=570657.309369 s E=-14.665000894886816 Er=1.608405e-04
+[MACRO_TIMING] ncas= 56 macro= 94 step=632.995389 s cum_CASSCF=571290.304758 s E=-14.665000894886816 Er=1.608405e-04
+[MACRO_TIMING] ncas= 56 macro= 94 step=824.946863 s cum_CASSCF=572115.251620 s E=-14.665000894886816 Er=1.608405e-04
+[MACRO_TIMING] ncas= 56 macro= 94 step=824.091724 s cum_CASSCF=572939.343344 s E=-14.665000894886816 Er=1.608405e-04
+macro iter  94 ( 21 JK    4 micro), CASSCF E = -14.6650034495975  dE = -2.55471066e-06  S^2 = 0.0000000
+               |grad[o]|=0.000166  |grad[c]|=0.00885  |ddm|=1.27e-05  |maxRot[o]|=0.192
+[MACRO_TIMING] ncas= 56 macro= 94 step=5708.210019 s cum_CASSCF=578647.553364 s E=-14.665003449597478 Er=1.606663e-04
+[MACRO_TIMING] ncas= 56 macro= 95 step=628.894904 s cum_CASSCF=579276.448268 s E=-14.665003449597478 Er=1.606663e-04
+[MACRO_TIMING] ncas= 56 macro= 95 step=824.237512 s cum_CASSCF=580100.685780 s E=-14.665003449597478 Er=1.606663e-04
+[MACRO_TIMING] ncas= 56 macro= 95 step=824.262257 s cum_CASSCF=580924.948037 s E=-14.665003449597478 Er=1.606663e-04
+macro iter  95 ( 21 JK    4 micro), CASSCF E = -14.6650158513016  dE = -1.24017041e-05  S^2 = 0.0000000
+               |grad[o]|=0.000268  |grad[c]|=0.0185  |ddm|=2.06e-05  |maxRot[o]|=0.234
+[MACRO_TIMING] ncas= 56 macro= 95 step=5708.972968 s cum_CASSCF=586633.921005 s E=-14.665015851301584 Er=1.598208e-04
+[MACRO_TIMING] ncas= 56 macro= 96 step=630.896737 s cum_CASSCF=587264.817742 s E=-14.665015851301584 Er=1.598208e-04
+macro iter  96 (  6 JK    1 micro), CASSCF E = -14.6650207046610  dE = -4.85335938e-06  S^2 = 0.0000000
+               |grad[o]|=0.000329  |grad[c]|=0.0153  |ddm|=1.18e-05  |maxRot[o]|=0.0477
+[MACRO_TIMING] ncas= 56 macro= 96 step=4662.447364 s cum_CASSCF=591927.265106 s E=-14.665020704660961 Er=1.594899e-04
+[MACRO_TIMING] ncas= 56 macro= 97 step=631.191731 s cum_CASSCF=592558.456837 s E=-14.665020704660961 Er=1.594899e-04
+macro iter  97 (  4 JK    1 micro), CASSCF E = -14.6650223856208  dE = -1.68095983e-06  S^2 = 0.0000000
+               |grad[o]|=0.000196  |grad[c]|=0.00542  |ddm|=6e-06  |maxRot[o]|= 0.02
+[MACRO_TIMING] ncas= 56 macro= 97 step=4238.231901 s cum_CASSCF=596796.688738 s E=-14.665022385620791 Er=1.593753e-04
+[MACRO_TIMING] ncas= 56 macro= 98 step=630.482284 s cum_CASSCF=597427.171022 s E=-14.665022385620791 Er=1.593753e-04
+macro iter  98 (  5 JK    1 micro), CASSCF E = -14.6650247653168  dE = -2.37969604e-06  S^2 = 0.0000000
+               |grad[o]|=0.000191  |grad[c]|=0.00765  |ddm|=7.69e-06  |maxRot[o]|= 0.04
+[MACRO_TIMING] ncas= 56 macro= 98 step=4442.929840 s cum_CASSCF=601870.100862 s E=-14.665024765316829 Er=1.592130e-04
+[MACRO_TIMING] ncas= 56 macro= 99 step=628.731056 s cum_CASSCF=602498.831919 s E=-14.665024765316829 Er=1.592130e-04
+[MACRO_TIMING] ncas= 56 macro= 99 step=825.723762 s cum_CASSCF=603324.555680 s E=-14.665024765316829 Er=1.592130e-04
+macro iter  99 ( 10 JK    2 micro), CASSCF E = -14.6650281900580  dE = -3.42474116e-06  S^2 = 0.0000000
+               |grad[o]|=0.000286  |grad[c]|=0.00529  |ddm|=1.98e-05  |maxRot[o]|=0.0851
+[MACRO_TIMING] ncas= 56 macro= 99 step=5759.373004 s cum_CASSCF=609083.928684 s E=-14.665028190057994 Er=1.589795e-04
+[MACRO_TIMING] ncas= 56 macro=100 step=645.815676 s cum_CASSCF=609729.744361 s E=-14.665028190057994 Er=1.589795e-04
+macro iter 100 (  4 JK    1 micro), CASSCF E = -14.6650290762928  dE = -8.86234817e-07  S^2 = 0.0000000
+               |grad[o]|=0.00018  |grad[c]|=0.00464  |ddm|=7.76e-06  |maxRot[o]|=0.0112
+[MACRO_TIMING] ncas= 56 macro=100 step=4560.699256 s cum_CASSCF=614290.443617 s E=-14.665029076292811 Er=1.589191e-04
+1-step CASSCF not converged, 100 macro (1378 JK 271 micro) steps
+CASSCF canonicalization
+Density matrix diagonal elements [1.99615833e+00 1.81769208e+00 4.05292207e-03 4.11016343e-03
+ 4.14443536e-03 1.14457715e-03 3.55229560e-02 3.55246873e-02
+ 3.56356378e-02 2.86577709e-05 2.85868115e-05 3.08611852e-05
+ 3.01753086e-05 3.03632551e-05 3.27655906e-03 1.80437964e-02
+ 1.81502034e-02 1.80414400e-02 4.13443145e-06 1.98374107e-05
+ 1.91872153e-05 1.47575125e-05 2.30673219e-05 1.61216200e-05
+ 1.22605919e-05 8.99892248e-05 8.79784206e-05 9.04661067e-05
+ 9.03196233e-05 8.89148343e-05 1.38003956e-03 1.68439414e-03
+ 1.61029144e-03 2.21301048e-03 4.78972505e-06 4.44730701e-06
+ 2.72369505e-06 3.70934084e-06 4.59667460e-06 1.72972385e-06
+ 5.20490975e-06 2.55069181e-06 2.47969266e-06 1.35646572e-05
+ 1.25068024e-05 9.47055017e-06 1.03446559e-05 1.48599298e-05
+ 1.37075168e-05 9.24463829e-06 3.36298215e-05 3.38102539e-05
+ 3.45968809e-05 3.40909626e-05 3.37597054e-05 6.22982205e-04]
+CASSCF energy = -14.6650290762928
+CASCI E = -14.6650290762928  E(CI) = -14.6650290762928  S^2 = 0.0000000
+CASSCF energy            : -14.6650290762928108 Ha
+CASSCF relative error    : 1.589191e-04
+CASSCF total wall time   : 614291.876423 s
+CASSCF initialization    : 1157.728193154995 s
+CASSCF converged flag    : False
+CASCI-CASSCF energy gain : 4.413393e-02 Ha
+Macro timing CSV         : /home/sjtu/TNNSOG/Pretrain/PySCF/results/Be_ncas56_20260902_154716/Be_CASSCF_ncas56_aug-cc-pCVQZ_ncas056_macro.csv
+
+============================================================================================
+Saved summary JSON: /home/sjtu/TNNSOG/Pretrain/PySCF/results/Be_ncas56_20260902_154716/Be_CASSCF_ncas56_aug-cc-pCVQZ.json
+Saved summary CSV : /home/sjtu/TNNSOG/Pretrain/PySCF/results/Be_ncas56_20260902_154716/Be_CASSCF_ncas56_aug-cc-pCVQZ.csv
+============================================================================================

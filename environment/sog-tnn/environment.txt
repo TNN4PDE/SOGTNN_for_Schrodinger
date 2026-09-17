@@ -1,0 +1,44 @@
+SOG-TNN / Slater-SOG-TNN
+======================
+Environment record date: 2026-09-16
+
+System
+------
+Operating system             Ubuntu 24.04.1 LTS
+Architecture                 x86_64
+Kernel                       Linux 6.11.0-29-generic
+glibc                        2.39
+CPU                          2 x Intel Xeon Gold 6530
+Physical cores               64
+Logical CPUs                 128
+System RAM                   Approximately 503 GiB
+GPU platform                 8 x NVIDIA GeForce RTX 4090 D
+VRAM per GPU                 24564 MiB
+Multi-GPU parallelism        Not used
+NVIDIA driver                550.144.03
+
+Python libraries
+----------------
+Python                       3.12.8
+PyTorch                      2.5.1
+NumPy                        2.2.1
+SciPy                        1.14.1
+Triton                       3.1.0
+SymPy (recorded installation) 1.13.3
+mpmath                       1.3.0
+opt-einsum                    3.4.0
+typing-extensions            4.12.2
+
+CUDA and numerical libraries
+----------------------------
+PyTorch CUDA build           12.4
+CUDA runtime package         12.4.1
+CUDA cudart package          12.4.127
+cuDNN                        9.1.0
+PyTorch MKL                  2022.1
+MKL-DNN                      3.5.3
+OpenMP                       4.5
+NumPy/SciPy BLAS backend      MKL 2022.1
+NumPy/SciPy BLAS/LAPACK
+Conda interface packages      3.9.0
+

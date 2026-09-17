@@ -1,0 +1,56 @@
+# Python bytecode and tool caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local Python environments; do NOT ignore the project's environment/ folder
+.venv/
+/venv/
+/env/
+
+# Generated Python packaging files
+/build/
+/dist/
+*.egg-info/
+
+# Compiler/runtime caches (if created inside this repository)
+.cache/
+.triton/
+.torchinductor/
+torch_compile_debug/
+
+# MATLAB autosave and crash files
+*.asv
+matlab_crash_dump.*
+java.log.*
+hs_err_pid*.log
+
+# Editor backups and machine-local settings
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local credentials/configuration; keep a shareable example if supplied
+.env
+.env.*
+!.env.example
+
+# New, unarchived run outputs: direct future local runs to this directory.
+# Move selected results to the appropriate archive directory before committing.
+/results/_local/
+
+# Intentionally NO blanket rules for data/, results/, or environment/.
+# Intentionally NO extension-wide exclusions for:
+# *.log, *.out, *.mat, *.csv, *.npy, *.npz, *.h5, *.hdf5, *.pt, *.pth, *.pkl
+# Existing paper/eager logs, matrices, checkpoints and environment reports remain eligible.

@@ -1,0 +1,541 @@
+
+============================================================
+J.H. He Table 5.1 Part 4: adaptive kappa iteration FINAL projected solver, no generalized sparse eigs + ALL eigensolve M-record timing
+Loading coarsened system: JH_He_Bthree0_coarsened_M310_nu13.mat
+============================================================
+
+Parameters:
+  Z=2, sigma=1, c=0.5, L0=7
+  kappa_max=10, updateMode=monotone_union, importanceMode=partial_orthogonal
+  max_basis_allowed=40000, mass_tol=1.0e-10
+
+Initial B^[0] from coarsening:
+  M=310 | Mzero=1 | Mone=198 | Mtwo_ud=111
+  E0(coarse) = -2.897506030267164
+  Table 5.1 target kappa=1: M=310, E=-2.897506, Mone=198, Mtwo=111
+
+
+############################################################
+kappa = 1, epsilon = 5.000000e-01
+############################################################
+
+  inner 1 | M=310 | Mone/two = 198 / 111
+    sparse block rows 1-310 / 310 inserted, nnz(S)=9.610e+04, nnz(H)=9.610e+04, elapsed 3.7 s
+  assembly/cache: 3.71 s | reused=0 | oldM=0 | addedM=310 | nnz(S/H)=9.610e+04/9.610e+04 | est sparse GB=0.003
+    projected dense solver: M=310, converting sparse S/H to full for mass projection...
+    mass eig/project: M=310 kept=310 min=6.303e-05 max=3.395e+01 time=0.01s
+    projected Hamiltonian built: nkeep=310 time=0.00s
+    standard eig direct: nkeep=310 E=-2.897506030267115 res=4.985e-17 time=0.00s
+  solve: 0.02 s | E=-2.897506030267138 | err=6.218e-03 | kept=310 | solver=projected-full-eig-direct
+  important=1 / 310 | score max=9.967e-01, min(nonzero)=4.917e-05 | importance 0.00 s
+  grown raw=311 | unique new M=310 | added=0 | grow 0.01 s
+  M-record #1 | kappa.inner=1.1 | M=310 | err=6.218e-03 | tAsm=3.7s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=3.9s
+  inner closure reached for kappa=1; keep current B_old with M=310.
+
+>>> record kappa=1 | M=310 | E=-2.897506030267138 | err=6.218e-03 | Mone=198 | Mtwo=111 | inner=1
+    row energy: Ezero=-2.564668 | Eone=-0.629040 | Etwo=0.296201 | sum=-2.897506030267137
+
+############################################################
+kappa = 2, epsilon = 2.500000e-01
+############################################################
+
+  inner 1 | M=310 | Mone/two = 198 / 111
+    sparse block rows 1-310 / 310 inserted, nnz(S)=9.610e+04, nnz(H)=9.610e+04, elapsed 2.0 s
+  assembly/cache: 2.03 s | reused=0 | oldM=0 | addedM=310 | nnz(S/H)=9.610e+04/9.610e+04 | est sparse GB=0.003
+    projected dense solver: M=310, converting sparse S/H to full for mass projection...
+    mass eig/project: M=310 kept=310 min=6.303e-05 max=3.395e+01 time=0.00s
+    projected Hamiltonian built: nkeep=310 time=0.00s
+    standard eig direct: nkeep=310 E=-2.897506030267115 res=4.985e-17 time=0.00s
+  solve: 0.01 s | E=-2.897506030267138 | err=6.218e-03 | kept=310 | solver=projected-full-eig-direct
+  important=1 / 310 | score max=9.967e-01, min(nonzero)=4.917e-05 | importance 0.00 s
+  grown raw=311 | unique new M=310 | added=0 | grow 0.01 s
+  M-record #2 | kappa.inner=2.1 | M=310 | err=6.218e-03 | tAsm=2.0s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=6.2s
+  inner closure reached for kappa=2; keep current B_old with M=310.
+
+>>> record kappa=2 | M=310 | E=-2.897506030267138 | err=6.218e-03 | Mone=198 | Mtwo=111 | inner=1
+    row energy: Ezero=-2.564668 | Eone=-0.629040 | Etwo=0.296201 | sum=-2.897506030267137
+
+############################################################
+kappa = 3, epsilon = 1.250000e-01
+############################################################
+
+  inner 1 | M=310 | Mone/two = 198 / 111
+    sparse block rows 1-310 / 310 inserted, nnz(S)=9.610e+04, nnz(H)=9.610e+04, elapsed 2.1 s
+  assembly/cache: 2.13 s | reused=0 | oldM=0 | addedM=310 | nnz(S/H)=9.610e+04/9.610e+04 | est sparse GB=0.003
+    projected dense solver: M=310, converting sparse S/H to full for mass projection...
+    mass eig/project: M=310 kept=310 min=6.303e-05 max=3.395e+01 time=0.01s
+    projected Hamiltonian built: nkeep=310 time=0.00s
+    standard eig direct: nkeep=310 E=-2.897506030267115 res=4.985e-17 time=0.00s
+  solve: 0.01 s | E=-2.897506030267138 | err=6.218e-03 | kept=310 | solver=projected-full-eig-direct
+  important=1 / 310 | score max=9.967e-01, min(nonzero)=4.917e-05 | importance 0.00 s
+  grown raw=311 | unique new M=310 | added=0 | grow 0.01 s
+  M-record #3 | kappa.inner=3.1 | M=310 | err=6.218e-03 | tAsm=2.1s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=8.7s
+  inner closure reached for kappa=3; keep current B_old with M=310.
+
+>>> record kappa=3 | M=310 | E=-2.897506030267138 | err=6.218e-03 | Mone=198 | Mtwo=111 | inner=1
+    row energy: Ezero=-2.564668 | Eone=-0.629040 | Etwo=0.296201 | sum=-2.897506030267137
+
+############################################################
+kappa = 4, epsilon = 6.250000e-02
+############################################################
+
+  inner 1 | M=310 | Mone/two = 198 / 111
+    sparse block rows 1-310 / 310 inserted, nnz(S)=9.610e+04, nnz(H)=9.610e+04, elapsed 1.9 s
+  assembly/cache: 1.92 s | reused=0 | oldM=0 | addedM=310 | nnz(S/H)=9.610e+04/9.610e+04 | est sparse GB=0.003
+    projected dense solver: M=310, converting sparse S/H to full for mass projection...
+    mass eig/project: M=310 kept=310 min=6.303e-05 max=3.395e+01 time=0.00s
+    projected Hamiltonian built: nkeep=310 time=0.00s
+    standard eig direct: nkeep=310 E=-2.897506030267115 res=4.985e-17 time=0.00s
+  solve: 0.01 s | E=-2.897506030267138 | err=6.218e-03 | kept=310 | solver=projected-full-eig-direct
+  important=2 / 310 | score max=9.967e-01, min(nonzero)=4.917e-05 | importance 0.00 s
+  grown raw=337 | unique new M=335 | added=25 | grow 0.04 s
+  M-record #4 | kappa.inner=4.1 | M=310 | err=6.218e-03 | tAsm=1.9s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=11.0s
+
+  inner 2 | M=335 | Mone/two = 198 / 136
+    sparse block rows 1-335 / 335 inserted, nnz(S)=1.122e+05, nnz(H)=1.122e+05, elapsed 2.1 s
+  assembly/cache: 2.09 s | reused=0 | oldM=0 | addedM=335 | nnz(S/H)=1.122e+05/1.122e+05 | est sparse GB=0.003
+    projected dense solver: M=335, converting sparse S/H to full for mass projection...
+    mass eig/project: M=335 kept=334 min=-9.827e-17 max=4.024e+01 time=0.01s
+    projected Hamiltonian built: nkeep=334 time=0.00s
+    standard eig direct: nkeep=334 E=-2.899675122919041 res=1.015e-16 time=0.01s
+  solve: 0.03 s | E=-2.899675122919046 | err=4.049e-03 | kept=334 | solver=projected-full-eig-direct
+  important=1 / 335 | score max=9.963e-01, min(nonzero)=5.732e-05 | importance 0.00 s
+  grown raw=336 | unique new M=335 | added=0 | grow 0.01 s
+  M-record #5 | kappa.inner=4.2 | M=335 | err=4.049e-03 | tAsm=2.1s tSol=0.0s tGrow=0.0s tSave=0.2s | cum=13.3s
+  inner closure reached for kappa=4; keep current B_old with M=335.
+
+>>> record kappa=4 | M=335 | E=-2.899675122919046 | err=4.049e-03 | Mone=198 | Mtwo=136 | inner=2
+    row energy: Ezero=-2.288572 | Eone=-1.172365 | Etwo=0.561262 | sum=-2.899675122919051
+
+############################################################
+kappa = 5, epsilon = 3.125000e-02
+############################################################
+
+  inner 1 | M=335 | Mone/two = 198 / 136
+    sparse block rows 1-335 / 335 inserted, nnz(S)=1.122e+05, nnz(H)=1.122e+05, elapsed 2.1 s
+  assembly/cache: 2.10 s | reused=0 | oldM=0 | addedM=335 | nnz(S/H)=1.122e+05/1.122e+05 | est sparse GB=0.003
+    projected dense solver: M=335, converting sparse S/H to full for mass projection...
+    mass eig/project: M=335 kept=334 min=-9.827e-17 max=4.024e+01 time=0.01s
+    projected Hamiltonian built: nkeep=334 time=0.00s
+    standard eig direct: nkeep=334 E=-2.899675122919041 res=1.015e-16 time=0.00s
+  solve: 0.02 s | E=-2.899675122919046 | err=4.049e-03 | kept=334 | solver=projected-full-eig-direct
+  important=3 / 335 | score max=9.963e-01, min(nonzero)=5.732e-05 | importance 0.00 s
+  grown raw=362 | unique new M=361 | added=26 | grow 0.02 s
+  M-record #6 | kappa.inner=5.1 | M=335 | err=4.049e-03 | tAsm=2.1s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=15.7s
+
+  inner 2 | M=361 | Mone/two = 224 / 136
+    sparse block rows 1-361 / 361 inserted, nnz(S)=1.303e+05, nnz(H)=1.303e+05, elapsed 2.3 s
+  assembly/cache: 2.27 s | reused=0 | oldM=0 | addedM=361 | nnz(S/H)=1.303e+05/1.303e+05 | est sparse GB=0.004
+    projected dense solver: M=361, converting sparse S/H to full for mass projection...
+    mass eig/project: M=361 kept=334 min=-8.092e-16 max=4.990e+01 time=0.01s
+    projected Hamiltonian built: nkeep=334 time=0.00s
+    standard eig direct: nkeep=334 E=-2.899675122919065 res=1.236e-16 time=0.00s
+  solve: 0.02 s | E=-2.899675122919045 | err=4.049e-03 | kept=334 | solver=projected-full-eig-direct
+  important=1 / 361 | score max=9.963e-01, min(nonzero)=5.732e-05 | importance 0.00 s
+  grown raw=362 | unique new M=361 | added=0 | grow 0.01 s
+  M-record #7 | kappa.inner=5.2 | M=361 | err=4.049e-03 | tAsm=2.3s tSol=0.0s tGrow=0.0s tSave=0.1s | cum=18.2s
+  inner closure reached for kappa=5; keep current B_old with M=361.
+
+>>> record kappa=5 | M=361 | E=-2.899675122919045 | err=4.049e-03 | Mone=224 | Mtwo=136 | inner=2
+    row energy: Ezero=-2.288572 | Eone=-1.172365 | Etwo=0.561262 | sum=-2.899675122919046
+
+############################################################
+kappa = 6, epsilon = 1.562500e-02
+############################################################
+
+  inner 1 | M=361 | Mone/two = 224 / 136
+    sparse block rows 1-361 / 361 inserted, nnz(S)=1.303e+05, nnz(H)=1.303e+05, elapsed 2.3 s
+  assembly/cache: 2.29 s | reused=0 | oldM=0 | addedM=361 | nnz(S/H)=1.303e+05/1.303e+05 | est sparse GB=0.004
+    projected dense solver: M=361, converting sparse S/H to full for mass projection...
+    mass eig/project: M=361 kept=334 min=-8.092e-16 max=4.990e+01 time=0.01s
+    projected Hamiltonian built: nkeep=334 time=0.00s
+    standard eig direct: nkeep=334 E=-2.899675122919065 res=1.236e-16 time=0.00s
+  solve: 0.02 s | E=-2.899675122919045 | err=4.049e-03 | kept=334 | solver=projected-full-eig-direct
+  important=11 / 361 | score max=9.963e-01, min(nonzero)=5.732e-05 | importance 0.00 s
+  grown raw=546 | unique new M=487 | added=126 | grow 0.07 s
+  M-record #8 | kappa.inner=6.1 | M=361 | err=4.049e-03 | tAsm=2.3s tSol=0.0s tGrow=0.1s tSave=0.2s | cum=20.9s
+
+  inner 2 | M=487 | Mone/two = 224 / 262
+    sparse block rows 1-487 / 487 inserted, nnz(S)=2.372e+05, nnz(H)=2.372e+05, elapsed 2.8 s
+  assembly/cache: 2.94 s | reused=0 | oldM=0 | addedM=487 | nnz(S/H)=2.372e+05/2.372e+05 | est sparse GB=0.007
+    projected dense solver: M=487, converting sparse S/H to full for mass projection...
+    mass eig/project: M=487 kept=454 min=-5.962e-16 max=5.747e+01 time=0.01s
+    projected Hamiltonian built: nkeep=454 time=0.00s
+    standard eig direct: nkeep=454 E=-2.900884837465791 res=5.761e-17 time=0.01s
+  solve: 0.03 s | E=-2.900884837465818 | err=2.840e-03 | kept=454 | solver=projected-full-eig-direct
+  important=17 / 487 | score max=9.960e-01, min(nonzero)=1.744e-05 | importance 0.00 s
+  grown raw=828 | unique new M=685 | added=198 | grow 0.09 s
+  M-record #9 | kappa.inner=6.2 | M=487 | err=2.840e-03 | tAsm=2.9s tSol=0.0s tGrow=0.1s tSave=0.2s | cum=24.2s
+
+  inner 3 | M=685 | Mone/two = 224 / 460
+    sparse block rows 1-512 / 685 inserted, nnz(S)=4.393e+05, nnz(H)=4.393e+05, elapsed 3.3 s
+    sparse block rows 513-685 / 685 inserted, nnz(S)=4.692e+05, nnz(H)=4.692e+05, elapsed 3.6 s
+  assembly/cache: 3.67 s | reused=0 | oldM=0 | addedM=685 | nnz(S/H)=4.692e+05/4.692e+05 | est sparse GB=0.014
+    projected dense solver: M=685, converting sparse S/H to full for mass projection...
+    mass eig/project: M=685 kept=652 min=-2.872e-16 max=7.900e+01 time=0.02s
+    projected Hamiltonian built: nkeep=652 time=0.01s
+    standard eig direct: nkeep=652 E=-2.901799430609731 res=7.349e-17 time=0.01s
+  solve: 0.06 s | E=-2.901799430609752 | err=1.925e-03 | kept=652 | solver=projected-full-eig-direct
+  important=31 / 685 | score max=9.960e-01, min(nonzero)=5.638e-05 | importance 0.00 s
+  grown raw=1054 | unique new M=781 | added=96 | grow 0.11 s
+  M-record #10 | kappa.inner=6.3 | M=685 | err=1.925e-03 | tAsm=3.7s tSol=0.1s tGrow=0.1s tSave=0.2s | cum=28.3s
+
+  final eigensolve required for updated M=781; record it as an M-sample.
+    sparse block rows 1-512 / 781 inserted, nnz(S)=5.376e+05, nnz(H)=5.376e+05, elapsed 4.0 s
+    sparse block rows 513-781 / 781 inserted, nnz(S)=6.100e+05, nnz(H)=6.100e+05, elapsed 5.7 s
+  final assembly/cache: 5.80 s | reused=0 | oldM=0 | addedM=781 | nnz(S/H)=6.100e+05/6.100e+05 | est sparse GB=0.018
+    projected dense solver: M=781, converting sparse S/H to full for mass projection...
+    mass eig/project: M=781 kept=712 min=-1.281e-15 max=8.774e+01 time=0.02s
+    projected Hamiltonian built: nkeep=712 time=0.01s
+    standard eig direct: nkeep=712 E=-2.901834089545916 res=7.116e-17 time=0.02s
+  final solve: 0.08 s | E=-2.901834089545933 | err=1.890e-03 | kept=712 | solver=projected-full-eig-direct
+  M-record #11 | source=final-solve | kappa.inner=6.4 | M=781 | err=1.890e-03 | tAsm=5.8s tSol=0.1s tSave=0.2s | cum=34.4s
+
+>>> record kappa=6 | M=781 | E=-2.901834089545933 | err=1.890e-03 | Mone=320 | Mtwo=460 | inner=4
+    row energy: Ezero=-1.860762 | Eone=-2.045375 | Etwo=1.004304 | sum=-2.901834089545939
+
+############################################################
+kappa = 7, epsilon = 7.812500e-03
+############################################################
+
+  inner 1 | M=781 | Mone/two = 320 / 460
+    sparse block rows 1-512 / 781 inserted, nnz(S)=5.376e+05, nnz(H)=5.376e+05, elapsed 4.0 s
+    sparse block rows 513-781 / 781 inserted, nnz(S)=6.100e+05, nnz(H)=6.100e+05, elapsed 5.7 s
+  assembly/cache: 5.82 s | reused=0 | oldM=0 | addedM=781 | nnz(S/H)=6.100e+05/6.100e+05 | est sparse GB=0.018
+    projected dense solver: M=781, converting sparse S/H to full for mass projection...
+    mass eig/project: M=781 kept=712 min=-1.281e-15 max=8.774e+01 time=0.02s
+    projected Hamiltonian built: nkeep=712 time=0.01s
+    standard eig direct: nkeep=712 E=-2.901834089545916 res=7.116e-17 time=0.02s
+  solve: 0.08 s | E=-2.901834089545933 | err=1.890e-03 | kept=712 | solver=projected-full-eig-direct
+  important=49 / 781 | score max=9.960e-01, min(nonzero)=3.054e-05 | importance 0.00 s
+  grown raw=1570 | unique new M=907 | added=126 | grow 0.25 s
+  M-record #12 | kappa.inner=7.1 | M=781 | err=1.890e-03 | tAsm=5.8s tSol=0.1s tGrow=0.3s tSave=0.2s | cum=41.1s
+
+  inner 2 | M=907 | Mone/two = 320 / 586
+    sparse block rows 1-512 / 907 inserted, nnz(S)=6.666e+05, nnz(H)=6.666e+05, elapsed 4.2 s
+    sparse block rows 513-907 / 907 inserted, nnz(S)=8.226e+05, nnz(H)=8.226e+05, elapsed 7.4 s
+  assembly/cache: 7.63 s | reused=0 | oldM=0 | addedM=907 | nnz(S/H)=8.226e+05/8.226e+05 | est sparse GB=0.025
+    projected dense solver: M=907, converting sparse S/H to full for mass projection...
+    mass eig/project: M=907 kept=832 min=-3.827e-16 max=8.923e+01 time=0.03s
+    projected Hamiltonian built: nkeep=832 time=0.02s
+    standard eig direct: nkeep=832 E=-2.902321635029824 res=2.819e-17 time=0.02s
+  solve: 0.11 s | E=-2.902321635029823 | err=1.403e-03 | kept=832 | solver=projected-full-eig-direct
+  important=43 / 907 | score max=9.960e-01, min(nonzero)=8.599e-06 | importance 0.00 s
+  grown raw=1564 | unique new M=907 | added=0 | grow 0.17 s
+  M-record #13 | kappa.inner=7.2 | M=907 | err=1.403e-03 | tAsm=7.6s tSol=0.1s tGrow=0.2s tSave=0.3s | cum=49.3s
+  inner closure reached for kappa=7; keep current B_old with M=907.
+
+>>> record kappa=7 | M=907 | E=-2.902321635029823 | err=1.403e-03 | Mone=320 | Mtwo=586 | inner=2
+    row energy: Ezero=-2.029960 | Eone=-1.725710 | Etwo=0.853348 | sum=-2.902321635029828
+
+############################################################
+kappa = 8, epsilon = 3.906250e-03
+############################################################
+
+  inner 1 | M=907 | Mone/two = 320 / 586
+    sparse block rows 1-512 / 907 inserted, nnz(S)=6.666e+05, nnz(H)=6.666e+05, elapsed 4.1 s
+    sparse block rows 513-907 / 907 inserted, nnz(S)=8.226e+05, nnz(H)=8.226e+05, elapsed 7.4 s
+  assembly/cache: 7.52 s | reused=0 | oldM=0 | addedM=907 | nnz(S/H)=8.226e+05/8.226e+05 | est sparse GB=0.025
+    projected dense solver: M=907, converting sparse S/H to full for mass projection...
+    mass eig/project: M=907 kept=832 min=-3.827e-16 max=8.923e+01 time=0.03s
+    projected Hamiltonian built: nkeep=832 time=0.02s
+    standard eig direct: nkeep=832 E=-2.902321635029824 res=2.819e-17 time=0.02s
+  solve: 0.11 s | E=-2.902321635029823 | err=1.403e-03 | kept=832 | solver=projected-full-eig-direct
+  important=139 / 907 | score max=9.960e-01, min(nonzero)=8.599e-06 | importance 0.00 s
+  grown raw=3460 | unique new M=1867 | added=960 | grow 0.72 s
+  M-record #14 | kappa.inner=8.1 | M=907 | err=1.403e-03 | tAsm=7.5s tSol=0.1s tGrow=0.7s tSave=0.3s | cum=58.2s
+
+  inner 2 | M=1867 | Mone/two = 416 / 1450
+    sparse block rows 1-512 / 1867 inserted, nnz(S)=1.650e+06, nnz(H)=1.650e+06, elapsed 6.2 s
+    sparse block rows 513-1024 / 1867 inserted, nnz(S)=2.775e+06, nnz(H)=2.775e+06, elapsed 12.1 s
+    sparse block rows 1025-1536 / 1867 inserted, nnz(S)=3.376e+06, nnz(H)=3.376e+06, elapsed 15.0 s
+    sparse block rows 1537-1867 / 1867 inserted, nnz(S)=3.486e+06, nnz(H)=3.486e+06, elapsed 17.1 s
+  assembly/cache: 17.89 s | reused=0 | oldM=0 | addedM=1867 | nnz(S/H)=3.486e+06/3.486e+06 | est sparse GB=0.104
+    projected dense solver: M=1867, converting sparse S/H to full for mass projection...
+    mass eig/project: M=1867 kept=1744 min=-4.526e-16 max=1.210e+02 time=0.25s
+    projected Hamiltonian built: nkeep=1744 time=0.14s
+    standard eig direct: nkeep=1744 E=-2.902715184593941 res=7.479e-17 time=0.20s
+  solve: 0.80 s | E=-2.902715184593929 | err=1.009e-03 | kept=1744 | solver=projected-full-eig-direct
+  important=93 / 1867 | score max=9.960e-01, min(nonzero)=3.928e-06 | importance 0.00 s
+  grown raw=3392 | unique new M=2091 | added=224 | grow 0.44 s
+  M-record #15 | kappa.inner=8.2 | M=1867 | err=1.009e-03 | tAsm=17.9s tSol=0.8s tGrow=0.4s tSave=0.5s | cum=77.9s
+
+  inner 3 | M=2091 | Mone/two = 416 / 1674
+    sparse block rows 1-512 / 2091 inserted, nnz(S)=1.879e+06, nnz(H)=1.879e+06, elapsed 7.3 s
+    sparse block rows 513-1024 / 2091 inserted, nnz(S)=3.234e+06, nnz(H)=3.234e+06, elapsed 13.8 s
+    sparse block rows 1025-1536 / 2091 inserted, nnz(S)=4.064e+06, nnz(H)=4.064e+06, elapsed 17.0 s
+    sparse block rows 1537-2048 / 2091 inserted, nnz(S)=4.370e+06, nnz(H)=4.370e+06, elapsed 20.2 s
+    sparse block rows 2049-2091 / 2091 inserted, nnz(S)=4.372e+06, nnz(H)=4.372e+06, elapsed 20.8 s
+  assembly/cache: 21.85 s | reused=0 | oldM=0 | addedM=2091 | nnz(S/H)=4.372e+06/4.372e+06 | est sparse GB=0.130
+    projected dense solver: M=2091, converting sparse S/H to full for mass projection...
+    mass eig/project: M=2091 kept=1960 min=-4.376e-16 max=1.237e+02 time=0.35s
+    projected Hamiltonian built: nkeep=1960 time=0.18s
+    standard eig direct: nkeep=1960 E=-2.902745870065828 res=5.640e-17 time=0.31s
+  solve: 1.12 s | E=-2.902745870065834 | err=9.785e-04 | kept=1960 | solver=projected-full-eig-direct
+  important=79 / 2091 | score max=9.960e-01, min(nonzero)=2.234e-05 | importance 0.00 s
+  grown raw=3276 | unique new M=2091 | added=0 | grow 0.34 s
+  M-record #16 | kappa.inner=8.3 | M=2091 | err=9.785e-04 | tAsm=21.9s tSol=1.1s tGrow=0.3s tSave=0.5s | cum=101.8s
+  inner closure reached for kappa=8; keep current B_old with M=2091.
+
+>>> record kappa=8 | M=2091 | E=-2.902745870065834 | err=9.785e-04 | Mone=416 | Mtwo=1674 | inner=3
+    row energy: Ezero=-1.935779 | Eone=-1.921957 | Etwo=0.954991 | sum=-2.902745870065857
+
+############################################################
+kappa = 9, epsilon = 1.953125e-03
+############################################################
+
+  inner 1 | M=2091 | Mone/two = 416 / 1674
+    sparse block rows 1-512 / 2091 inserted, nnz(S)=1.879e+06, nnz(H)=1.879e+06, elapsed 7.2 s
+    sparse block rows 513-1024 / 2091 inserted, nnz(S)=3.234e+06, nnz(H)=3.234e+06, elapsed 13.8 s
+    sparse block rows 1025-1536 / 2091 inserted, nnz(S)=4.064e+06, nnz(H)=4.064e+06, elapsed 17.0 s
+    sparse block rows 1537-2048 / 2091 inserted, nnz(S)=4.370e+06, nnz(H)=4.370e+06, elapsed 20.2 s
+    sparse block rows 2049-2091 / 2091 inserted, nnz(S)=4.372e+06, nnz(H)=4.372e+06, elapsed 20.9 s
+  assembly/cache: 21.58 s | reused=0 | oldM=0 | addedM=2091 | nnz(S/H)=4.372e+06/4.372e+06 | est sparse GB=0.130
+    projected dense solver: M=2091, converting sparse S/H to full for mass projection...
+    mass eig/project: M=2091 kept=1960 min=-4.376e-16 max=1.237e+02 time=0.36s
+    projected Hamiltonian built: nkeep=1960 time=0.22s
+    standard eig direct: nkeep=1960 E=-2.902745870065828 res=5.640e-17 time=0.29s
+  solve: 1.13 s | E=-2.902745870065834 | err=9.785e-04 | kept=1960 | solver=projected-full-eig-direct
+  important=293 / 2091 | score max=9.960e-01, min(nonzero)=2.234e-05 | importance 0.00 s
+  grown raw=7280 | unique new M=3539 | added=1448 | grow 1.43 s
+  M-record #17 | kappa.inner=9.1 | M=2091 | err=9.785e-04 | tAsm=21.6s tSol=1.1s tGrow=1.4s tSave=0.7s | cum=127.2s
+
+  inner 2 | M=3539 | Mone/two = 960 / 2578
+    sparse block rows 1-512 / 3539 inserted, nnz(S)=3.362e+06, nnz(H)=3.362e+06, elapsed 12.8 s
+    sparse block rows 513-1024 / 3539 inserted, nnz(S)=6.199e+06, nnz(H)=6.199e+06, elapsed 24.2 s
+    sparse block rows 1025-1536 / 3539 inserted, nnz(S)=8.513e+06, nnz(H)=8.513e+06, elapsed 29.9 s
+    sparse block rows 1537-2048 / 3539 inserted, nnz(S)=1.030e+07, nnz(H)=1.030e+07, elapsed 35.7 s
+    sparse block rows 2049-2560 / 3539 inserted, nnz(S)=1.157e+07, nnz(H)=1.157e+07, elapsed 47.6 s
+    sparse block rows 2561-3072 / 3539 inserted, nnz(S)=1.231e+07, nnz(H)=1.231e+07, elapsed 51.6 s
+    sparse block rows 3073-3539 / 3539 inserted, nnz(S)=1.252e+07, nnz(H)=1.252e+07, elapsed 69.7 s
+  assembly/cache: 74.45 s | reused=0 | oldM=0 | addedM=3539 | nnz(S/H)=1.252e+07/1.252e+07 | est sparse GB=0.373
+    projected dense solver: M=3539, converting sparse S/H to full for mass projection...
+    mass eig/project: M=3539 kept=3380 min=-5.476e-16 max=1.519e+02 time=2.09s
+    projected Hamiltonian built: nkeep=3380 time=0.75s
+    standard eig direct: nkeep=3380 E=-2.902856587518893 res=3.054e-17 time=1.78s
+  solve: 5.44 s | E=-2.902856587518898 | err=8.678e-04 | kept=3380 | solver=projected-full-eig-direct
+  important=289 / 3539 | score max=9.960e-01, min(nonzero)=8.239e-06 | importance 0.01 s
+  grown raw=8528 | unique new M=4087 | added=548 | grow 1.30 s
+  M-record #18 | kappa.inner=9.2 | M=3539 | err=8.678e-04 | tAsm=74.4s tSol=5.4s tGrow=1.3s tSave=0.9s | cum=209.5s
+
+  inner 3 | M=4087 | Mone/two = 1072 / 3014
+    sparse block rows 1-512 / 4087 inserted, nnz(S)=3.923e+06, nnz(H)=3.923e+06, elapsed 14.2 s
+    sparse block rows 513-1024 / 4087 inserted, nnz(S)=7.322e+06, nnz(H)=7.322e+06, elapsed 26.8 s
+    sparse block rows 1025-1536 / 4087 inserted, nnz(S)=1.020e+07, nnz(H)=1.020e+07, elapsed 33.0 s
+    sparse block rows 1537-2048 / 4087 inserted, nnz(S)=1.255e+07, nnz(H)=1.255e+07, elapsed 39.6 s
+    sparse block rows 2049-2560 / 4087 inserted, nnz(S)=1.437e+07, nnz(H)=1.437e+07, elapsed 53.1 s
+    sparse block rows 2561-3072 / 4087 inserted, nnz(S)=1.567e+07, nnz(H)=1.567e+07, elapsed 57.6 s
+    sparse block rows 3073-3584 / 4087 inserted, nnz(S)=1.645e+07, nnz(H)=1.645e+07, elapsed 79.4 s
+    sparse block rows 3585-4087 / 4087 inserted, nnz(S)=1.670e+07, nnz(H)=1.670e+07, elapsed 90.7 s
+  assembly/cache: 93.68 s | reused=0 | oldM=0 | addedM=4087 | nnz(S/H)=1.670e+07/1.670e+07 | est sparse GB=0.498
+    projected dense solver: M=4087, converting sparse S/H to full for mass projection...
+    mass eig/project: M=4087 kept=3882 min=-2.389e-15 max=1.732e+02 time=3.60s
+    projected Hamiltonian built: nkeep=3882 time=1.11s
+    standard shift-invert: nkeep=3882 E=-2.902861180337435 res=5.096e-19 flag=0 time=0.64s
+  solve: 6.49 s | E=-2.902861180337438 | err=8.632e-04 | kept=3882 | solver=projected-standard-shift-invert(-2.9040147)
+  important=253 / 4087 | score max=9.960e-01, min(nonzero)=1.268e-06 | importance 0.01 s
+  grown raw=8332 | unique new M=4087 | added=0 | grow 1.16 s
+  M-record #19 | kappa.inner=9.3 | M=4087 | err=8.632e-04 | tAsm=93.7s tSol=6.5s tGrow=1.2s tSave=1.1s | cum=312.1s
+  inner closure reached for kappa=9; keep current B_old with M=4087.
+
+>>> record kappa=9 | M=4087 | E=-2.902861180337438 | err=8.632e-04 | Mone=1072 | Mtwo=3014 | inner=3
+    row energy: Ezero=-1.849515 | Eone=-2.077091 | Etwo=1.023745 | sum=-2.902861180337425
+
+############################################################
+kappa = 10, epsilon = 9.765625e-04
+############################################################
+
+  inner 1 | M=4087 | Mone/two = 1072 / 3014
+    sparse block rows 1-512 / 4087 inserted, nnz(S)=3.923e+06, nnz(H)=3.923e+06, elapsed 14.1 s
+    sparse block rows 513-1024 / 4087 inserted, nnz(S)=7.322e+06, nnz(H)=7.322e+06, elapsed 26.8 s
+    sparse block rows 1025-1536 / 4087 inserted, nnz(S)=1.020e+07, nnz(H)=1.020e+07, elapsed 33.2 s
+    sparse block rows 1537-2048 / 4087 inserted, nnz(S)=1.255e+07, nnz(H)=1.255e+07, elapsed 39.7 s
+    sparse block rows 2049-2560 / 4087 inserted, nnz(S)=1.437e+07, nnz(H)=1.437e+07, elapsed 53.0 s
+    sparse block rows 2561-3072 / 4087 inserted, nnz(S)=1.567e+07, nnz(H)=1.567e+07, elapsed 57.6 s
+    sparse block rows 3073-3584 / 4087 inserted, nnz(S)=1.645e+07, nnz(H)=1.645e+07, elapsed 79.5 s
+    sparse block rows 3585-4087 / 4087 inserted, nnz(S)=1.670e+07, nnz(H)=1.670e+07, elapsed 90.8 s
+  assembly/cache: 93.83 s | reused=0 | oldM=0 | addedM=4087 | nnz(S/H)=1.670e+07/1.670e+07 | est sparse GB=0.498
+    projected dense solver: M=4087, converting sparse S/H to full for mass projection...
+    mass eig/project: M=4087 kept=3882 min=-2.389e-15 max=1.732e+02 time=3.62s
+    projected Hamiltonian built: nkeep=3882 time=1.14s
+    standard shift-invert: nkeep=3882 E=-2.902861180337435 res=5.096e-19 flag=0 time=0.64s
+  solve: 6.56 s | E=-2.902861180337438 | err=8.632e-04 | kept=3882 | solver=projected-standard-shift-invert(-2.9040147)
+  important=781 / 4087 | score max=9.960e-01, min(nonzero)=1.268e-06 | importance 0.01 s
+  grown raw=19532 | unique new M=9069 | added=4982 | grow 3.99 s
+  M-record #20 | kappa.inner=10.1 | M=4087 | err=8.632e-04 | tAsm=93.8s tSol=6.6s tGrow=4.0s tSave=1.2s | cum=419.2s
+
+  inner 2 | M=9069 | Mone/two = 1264 / 7804
+    sparse block rows 1-512 / 9069 inserted, nnz(S)=9.025e+06, nnz(H)=9.025e+06, elapsed 23.0 s
+    sparse block rows 513-1024 / 9069 inserted, nnz(S)=1.752e+07, nnz(H)=1.752e+07, elapsed 45.1 s
+    sparse block rows 1025-1536 / 9069 inserted, nnz(S)=2.550e+07, nnz(H)=2.550e+07, elapsed 56.6 s
+    sparse block rows 1537-2048 / 9069 inserted, nnz(S)=3.295e+07, nnz(H)=3.295e+07, elapsed 69.1 s
+    sparse block rows 2049-2560 / 9069 inserted, nnz(S)=3.988e+07, nnz(H)=3.988e+07, elapsed 93.5 s
+    sparse block rows 2561-3072 / 9069 inserted, nnz(S)=4.628e+07, nnz(H)=4.628e+07, elapsed 103.4 s
+    sparse block rows 3073-3584 / 9069 inserted, nnz(S)=5.216e+07, nnz(H)=5.216e+07, elapsed 143.4 s
+    sparse block rows 3585-4096 / 9069 inserted, nnz(S)=5.752e+07, nnz(H)=5.752e+07, elapsed 166.9 s
+    sparse block rows 4097-4608 / 9069 inserted, nnz(S)=6.235e+07, nnz(H)=6.235e+07, elapsed 195.6 s
+    sparse block rows 4609-5120 / 9069 inserted, nnz(S)=6.665e+07, nnz(H)=6.665e+07, elapsed 208.7 s
+    sparse block rows 5121-5632 / 9069 inserted, nnz(S)=7.043e+07, nnz(H)=7.043e+07, elapsed 222.2 s
+    sparse block rows 5633-6144 / 9069 inserted, nnz(S)=7.369e+07, nnz(H)=7.369e+07, elapsed 239.3 s
+    sparse block rows 6145-6656 / 9069 inserted, nnz(S)=7.642e+07, nnz(H)=7.642e+07, elapsed 256.6 s
+    sparse block rows 6657-7168 / 9069 inserted, nnz(S)=7.863e+07, nnz(H)=7.863e+07, elapsed 274.1 s
+    sparse block rows 7169-7680 / 9069 inserted, nnz(S)=8.032e+07, nnz(H)=8.032e+07, elapsed 291.8 s
+    sparse block rows 7681-8192 / 9069 inserted, nnz(S)=8.148e+07, nnz(H)=8.148e+07, elapsed 309.1 s
+    sparse block rows 8193-8704 / 9069 inserted, nnz(S)=8.211e+07, nnz(H)=8.211e+07, elapsed 322.4 s
+    sparse block rows 8705-9069 / 9069 inserted, nnz(S)=8.225e+07, nnz(H)=8.225e+07, elapsed 334.5 s
+  assembly/cache: 353.75 s | reused=0 | oldM=0 | addedM=9069 | nnz(S/H)=8.225e+07/8.225e+07 | est sparse GB=2.451
+    projected dense solver: M=9069, converting sparse S/H to full for mass projection...
+    mass eig/project: M=9069 kept=8838 min=-9.840e-15 max=2.335e+02 time=35.00s
+    projected Hamiltonian built: nkeep=8838 time=12.54s
+    standard shift-invert: nkeep=8838 E=-2.903048673032364 res=1.008e-18 flag=0 time=3.95s
+  solve: 57.81 s | E=-2.903048673032361 | err=6.757e-04 | kept=8838 | solver=projected-standard-shift-invert(-2.9040147)
+  important=1381 / 9069 | score max=9.960e-01, min(nonzero)=1.102e-06 | importance 0.10 s
+  grown raw=39418 | unique new M=17299 | added=8230 | grow 7.88 s
+  M-record #21 | kappa.inner=10.2 | M=9069 | err=6.757e-04 | tAsm=353.7s tSol=57.8s tGrow=7.9s tSave=2.5s | cum=842.0s
+
+  inner 3 | M=17299 | Mone/two = 1808 / 15490
+    sparse block rows 1-512 / 17299 inserted, nnz(S)=1.745e+07, nnz(H)=1.745e+07, elapsed 41.6 s
+    sparse block rows 513-1024 / 17299 inserted, nnz(S)=3.438e+07, nnz(H)=3.438e+07, elapsed 80.6 s
+    sparse block rows 1025-1536 / 17299 inserted, nnz(S)=5.078e+07, nnz(H)=5.078e+07, elapsed 101.6 s
+    sparse block rows 1537-2048 / 17299 inserted, nnz(S)=6.666e+07, nnz(H)=6.666e+07, elapsed 124.4 s
+    sparse block rows 2049-2560 / 17299 inserted, nnz(S)=8.202e+07, nnz(H)=8.202e+07, elapsed 168.5 s
+    sparse block rows 2561-3072 / 17299 inserted, nnz(S)=9.685e+07, nnz(H)=9.685e+07, elapsed 188.0 s
+    sparse block rows 3073-3584 / 17299 inserted, nnz(S)=1.112e+08, nnz(H)=1.112e+08, elapsed 261.0 s
+    sparse block rows 3585-4096 / 17299 inserted, nnz(S)=1.249e+08, nnz(H)=1.249e+08, elapsed 305.9 s
+    sparse block rows 4097-4608 / 17299 inserted, nnz(S)=1.382e+08, nnz(H)=1.382e+08, elapsed 360.6 s
+    sparse block rows 4609-5120 / 17299 inserted, nnz(S)=1.509e+08, nnz(H)=1.509e+08, elapsed 388.8 s
+    sparse block rows 5121-5632 / 17299 inserted, nnz(S)=1.631e+08, nnz(H)=1.631e+08, elapsed 418.8 s
+    sparse block rows 5633-6144 / 17299 inserted, nnz(S)=1.748e+08, nnz(H)=1.748e+08, elapsed 455.5 s
+    sparse block rows 6145-6656 / 17299 inserted, nnz(S)=1.860e+08, nnz(H)=1.860e+08, elapsed 493.8 s
+    sparse block rows 6657-7168 / 17299 inserted, nnz(S)=1.966e+08, nnz(H)=1.966e+08, elapsed 533.6 s
+    sparse block rows 7169-7680 / 17299 inserted, nnz(S)=2.067e+08, nnz(H)=2.067e+08, elapsed 575.1 s
+    sparse block rows 7681-8192 / 17299 inserted, nnz(S)=2.163e+08, nnz(H)=2.163e+08, elapsed 616.2 s
+    sparse block rows 8193-8704 / 17299 inserted, nnz(S)=2.254e+08, nnz(H)=2.254e+08, elapsed 651.3 s
+    sparse block rows 8705-9216 / 17299 inserted, nnz(S)=2.339e+08, nnz(H)=2.339e+08, elapsed 704.9 s
+    sparse block rows 9217-9728 / 17299 inserted, nnz(S)=2.419e+08, nnz(H)=2.419e+08, elapsed 751.4 s
+    sparse block rows 9729-10240 / 17299 inserted, nnz(S)=2.494e+08, nnz(H)=2.494e+08, elapsed 797.5 s
+    sparse block rows 10241-10752 / 17299 inserted, nnz(S)=2.564e+08, nnz(H)=2.564e+08, elapsed 863.8 s
+    sparse block rows 10753-11264 / 17299 inserted, nnz(S)=2.628e+08, nnz(H)=2.628e+08, elapsed 935.1 s
+    sparse block rows 11265-11776 / 17299 inserted, nnz(S)=2.688e+08, nnz(H)=2.688e+08, elapsed 979.0 s
+    sparse block rows 11777-12288 / 17299 inserted, nnz(S)=2.741e+08, nnz(H)=2.741e+08, elapsed 1023.8 s
+    sparse block rows 12289-12800 / 17299 inserted, nnz(S)=2.790e+08, nnz(H)=2.790e+08, elapsed 1069.3 s
+    sparse block rows 12801-13312 / 17299 inserted, nnz(S)=2.834e+08, nnz(H)=2.834e+08, elapsed 1114.4 s
+    sparse block rows 13313-13824 / 17299 inserted, nnz(S)=2.872e+08, nnz(H)=2.872e+08, elapsed 1162.8 s
+    sparse block rows 13825-14336 / 17299 inserted, nnz(S)=2.905e+08, nnz(H)=2.905e+08, elapsed 1211.2 s
+    sparse block rows 14337-14848 / 17299 inserted, nnz(S)=2.932e+08, nnz(H)=2.932e+08, elapsed 1261.7 s
+    sparse block rows 14849-15360 / 17299 inserted, nnz(S)=2.955e+08, nnz(H)=2.955e+08, elapsed 1313.5 s
+    sparse block rows 15361-15872 / 17299 inserted, nnz(S)=2.972e+08, nnz(H)=2.972e+08, elapsed 1364.8 s
+    sparse block rows 15873-16384 / 17299 inserted, nnz(S)=2.984e+08, nnz(H)=2.984e+08, elapsed 1416.1 s
+    sparse block rows 16385-16896 / 17299 inserted, nnz(S)=2.991e+08, nnz(H)=2.991e+08, elapsed 1463.3 s
+    sparse block rows 16897-17299 / 17299 inserted, nnz(S)=2.993e+08, nnz(H)=2.993e+08, elapsed 1504.5 s
+  assembly/cache: 1717.58 s | reused=0 | oldM=0 | addedM=17299 | nnz(S/H)=2.993e+08/2.993e+08 | est sparse GB=8.919
+    projected dense solver: M=17299, converting sparse S/H to full for mass projection...
+    mass eig/project: M=17299 kept=17032 min=-1.481e-14 max=2.912e+02 time=240.16s
+    projected Hamiltonian built: nkeep=17032 time=87.99s
+    standard shift-invert: nkeep=17032 E=-2.903111276028610 res=9.076e-19 flag=0 time=18.20s
+  solve: 374.71 s | E=-2.903111276028613 | err=6.131e-04 | kept=17032 | solver=projected-standard-shift-invert(-2.9040147)
+  important=1601 / 17299 | score max=9.960e-01, min(nonzero)=6.902e-07 | importance 0.38 s
+  grown raw=51712 | unique new M=23257 | added=5958 | grow 10.06 s
+  M-record #22 | kappa.inner=10.3 | M=17299 | err=6.131e-04 | tAsm=1717.6s tSol=374.7s tGrow=10.1s tSave=4.6s | cum=2952.4s
+
+  final eigensolve required for updated M=23257; record it as an M-sample.
+    sparse block rows 1-512 / 23257 inserted, nnz(S)=2.355e+07, nnz(H)=2.355e+07, elapsed 54.1 s
+    sparse block rows 513-1024 / 23257 inserted, nnz(S)=4.658e+07, nnz(H)=4.658e+07, elapsed 105.9 s
+    sparse block rows 1025-1536 / 23257 inserted, nnz(S)=6.909e+07, nnz(H)=6.909e+07, elapsed 133.8 s
+    sparse block rows 1537-2048 / 23257 inserted, nnz(S)=9.107e+07, nnz(H)=9.107e+07, elapsed 164.5 s
+    sparse block rows 2049-2560 / 23257 inserted, nnz(S)=1.125e+08, nnz(H)=1.125e+08, elapsed 223.9 s
+    sparse block rows 2561-3072 / 23257 inserted, nnz(S)=1.335e+08, nnz(H)=1.335e+08, elapsed 250.1 s
+    sparse block rows 3073-3584 / 23257 inserted, nnz(S)=1.539e+08, nnz(H)=1.539e+08, elapsed 347.0 s
+    sparse block rows 3585-4096 / 23257 inserted, nnz(S)=1.737e+08, nnz(H)=1.737e+08, elapsed 407.0 s
+    sparse block rows 4097-4608 / 23257 inserted, nnz(S)=1.931e+08, nnz(H)=1.931e+08, elapsed 480.7 s
+    sparse block rows 4609-5120 / 23257 inserted, nnz(S)=2.119e+08, nnz(H)=2.119e+08, elapsed 519.4 s
+    sparse block rows 5121-5632 / 23257 inserted, nnz(S)=2.302e+08, nnz(H)=2.302e+08, elapsed 560.7 s
+    sparse block rows 5633-6144 / 23257 inserted, nnz(S)=2.480e+08, nnz(H)=2.480e+08, elapsed 611.7 s
+    sparse block rows 6145-6656 / 23257 inserted, nnz(S)=2.653e+08, nnz(H)=2.653e+08, elapsed 665.1 s
+    sparse block rows 6657-7168 / 23257 inserted, nnz(S)=2.820e+08, nnz(H)=2.820e+08, elapsed 721.2 s
+    sparse block rows 7169-7680 / 23257 inserted, nnz(S)=2.982e+08, nnz(H)=2.982e+08, elapsed 779.0 s
+    sparse block rows 7681-8192 / 23257 inserted, nnz(S)=3.139e+08, nnz(H)=3.139e+08, elapsed 837.7 s
+    sparse block rows 8193-8704 / 23257 inserted, nnz(S)=3.291e+08, nnz(H)=3.291e+08, elapsed 889.2 s
+    sparse block rows 8705-9216 / 23257 inserted, nnz(S)=3.437e+08, nnz(H)=3.437e+08, elapsed 964.7 s
+    sparse block rows 9217-9728 / 23257 inserted, nnz(S)=3.579e+08, nnz(H)=3.579e+08, elapsed 1032.6 s
+    sparse block rows 9729-10240 / 23257 inserted, nnz(S)=3.714e+08, nnz(H)=3.714e+08, elapsed 1099.5 s
+    sparse block rows 10241-10752 / 23257 inserted, nnz(S)=3.845e+08, nnz(H)=3.845e+08, elapsed 1193.7 s
+    sparse block rows 10753-11264 / 23257 inserted, nnz(S)=3.971e+08, nnz(H)=3.971e+08, elapsed 1295.0 s
+    sparse block rows 11265-11776 / 23257 inserted, nnz(S)=4.091e+08, nnz(H)=4.091e+08, elapsed 1361.4 s
+    sparse block rows 11777-12288 / 23257 inserted, nnz(S)=4.206e+08, nnz(H)=4.206e+08, elapsed 1427.9 s
+    sparse block rows 12289-12800 / 23257 inserted, nnz(S)=4.315e+08, nnz(H)=4.315e+08, elapsed 1496.7 s
+    sparse block rows 12801-13312 / 23257 inserted, nnz(S)=4.420e+08, nnz(H)=4.420e+08, elapsed 1566.4 s
+    sparse block rows 13313-13824 / 23257 inserted, nnz(S)=4.519e+08, nnz(H)=4.519e+08, elapsed 1641.3 s
+    sparse block rows 13825-14336 / 23257 inserted, nnz(S)=4.613e+08, nnz(H)=4.613e+08, elapsed 1723.9 s
+    sparse block rows 14337-14848 / 23257 inserted, nnz(S)=4.702e+08, nnz(H)=4.702e+08, elapsed 1816.6 s
+    sparse block rows 14849-15360 / 23257 inserted, nnz(S)=4.785e+08, nnz(H)=4.785e+08, elapsed 1941.8 s
+    sparse block rows 15361-15872 / 23257 inserted, nnz(S)=4.863e+08, nnz(H)=4.863e+08, elapsed 2081.5 s
+    sparse block rows 15873-16384 / 23257 inserted, nnz(S)=4.936e+08, nnz(H)=4.936e+08, elapsed 2203.3 s
+    sparse block rows 16385-16896 / 23257 inserted, nnz(S)=5.004e+08, nnz(H)=5.004e+08, elapsed 2325.3 s
+    sparse block rows 16897-17408 / 23257 inserted, nnz(S)=5.067e+08, nnz(H)=5.067e+08, elapsed 2479.8 s
+    sparse block rows 17409-17920 / 23257 inserted, nnz(S)=5.124e+08, nnz(H)=5.124e+08, elapsed 2571.3 s
+    sparse block rows 17921-18432 / 23257 inserted, nnz(S)=5.176e+08, nnz(H)=5.176e+08, elapsed 2696.6 s
+    sparse block rows 18433-18944 / 23257 inserted, nnz(S)=5.223e+08, nnz(H)=5.223e+08, elapsed 2794.0 s
+    sparse block rows 18945-19456 / 23257 inserted, nnz(S)=5.264e+08, nnz(H)=5.264e+08, elapsed 2886.0 s
+    sparse block rows 19457-19968 / 23257 inserted, nnz(S)=5.301e+08, nnz(H)=5.301e+08, elapsed 2977.9 s
+    sparse block rows 19969-20480 / 23257 inserted, nnz(S)=5.332e+08, nnz(H)=5.332e+08, elapsed 3073.3 s
+    sparse block rows 20481-20992 / 23257 inserted, nnz(S)=5.358e+08, nnz(H)=5.358e+08, elapsed 3168.4 s
+    sparse block rows 20993-21504 / 23257 inserted, nnz(S)=5.378e+08, nnz(H)=5.378e+08, elapsed 3265.5 s
+    sparse block rows 21505-22016 / 23257 inserted, nnz(S)=5.393e+08, nnz(H)=5.393e+08, elapsed 3539.9 s
+    sparse block rows 22017-22528 / 23257 inserted, nnz(S)=5.404e+08, nnz(H)=5.404e+08, elapsed 3644.4 s
+    sparse block rows 22529-23040 / 23257 inserted, nnz(S)=5.408e+08, nnz(H)=5.408e+08, elapsed 3744.5 s
+    sparse block rows 23041-23257 / 23257 inserted, nnz(S)=5.409e+08, nnz(H)=5.409e+08, elapsed 3823.4 s
+  final assembly/cache: 4230.65 s | reused=0 | oldM=0 | addedM=23257 | nnz(S/H)=5.409e+08/5.409e+08 | est sparse GB=16.120
+    projected dense solver: M=23257, converting sparse S/H to full for mass projection...
+    mass eig/project: M=23257 kept=22990 min=-1.024e-14 max=3.095e+02 time=548.81s
+    projected Hamiltonian built: nkeep=22990 time=207.94s
+    standard shift-invert: nkeep=22990 E=-2.903233320482313 res=6.114e-19 flag=0 time=37.60s
+  final solve: 1004.76 s | E=-2.903233320482309 | err=4.911e-04 | kept=22990 | solver=projected-standard-shift-invert(-2.9040147)
+  M-record #23 | source=final-solve | kappa.inner=10.4 | M=23257 | err=4.911e-04 | tAsm=4230.7s tSol=1004.8s tSave=6.2s | cum=8221.6s
+
+>>> record kappa=10 | M=23257 | E=-2.903233320482309 | err=4.911e-04 | Mone=2048 | Mtwo=21208 | inner=4
+    row energy: Ezero=-1.879824 | Eone=-2.031828 | Etwo=1.008419 | sum=-2.903233320482313
+
+==================== TABLE 5.1 STYLE SUMMARY ====================
+ kappa      M        E                    err          Mone      Mtwo       Ezero      Eone       Etwo
+    1      310  -2.897506030267138  6.218e-03       198       111      -2.56      -0.63       0.30
+    2      310  -2.897506030267138  6.218e-03       198       111      -2.56      -0.63       0.30
+    3      310  -2.897506030267138  6.218e-03       198       111      -2.56      -0.63       0.30
+    4      335  -2.899675122919046  4.049e-03       198       136      -2.29      -1.17       0.56
+    5      361  -2.899675122919045  4.049e-03       224       136      -2.29      -1.17       0.56
+    6      781  -2.901834089545933  1.890e-03       320       460      -1.86      -2.05       1.00
+    7      907  -2.902321635029823  1.403e-03       320       586      -2.03      -1.73       0.85
+    8     2091  -2.902745870065834  9.785e-04       416      1674      -1.94      -1.92       0.95
+    9     4087  -2.902861180337438  8.632e-04      1072      3014      -1.85      -2.08       1.02
+   10    23257  -2.903233320482309  4.911e-04      2048     21208      -1.88      -2.03       1.01
+
+==================== M-INDEXED INNER RECORDS FOR EXTRAPOLATION ====================
+ sample  source              k.i       M        E                    err        tAsm     tSol    tGrow   tInner  tCum
+     1  inner-solve          1.01      310  -2.897506030267138  6.218e-03       3.7      0.0      0.0      3.7      3.7
+     2  inner-solve          2.01      310  -2.897506030267138  6.218e-03       2.0      0.0      0.0      2.1      6.1
+     3  inner-solve          3.01      310  -2.897506030267138  6.218e-03       2.1      0.0      0.0      2.2      8.5
+     4  inner-solve          4.01      310  -2.897506030267138  6.218e-03       1.9      0.0      0.0      2.0     10.8
+     5  inner-solve          4.02      335  -2.899675122919046  4.049e-03       2.1      0.0      0.0      2.1     13.1
+     6  inner-solve          5.01      335  -2.899675122919046  4.049e-03       2.1      0.0      0.0      2.1     15.6
+     7  inner-solve          5.02      361  -2.899675122919045  4.049e-03       2.3      0.0      0.0      2.3     18.0
+     8  inner-solve          6.01      361  -2.899675122919045  4.049e-03       2.3      0.0      0.1      2.4     20.7
+     9  inner-solve          6.02      487  -2.900884837465818  2.840e-03       2.9      0.0      0.1      3.1     24.0
+    10  inner-solve          6.03      685  -2.901799430609752  1.925e-03       3.7      0.1      0.1      3.8     28.0
+    11  kappa-final-solve    6.04      781  -2.901834089545933  1.890e-03       5.8      0.1      0.0      5.9     34.2
+    12  inner-solve          7.01      781  -2.901834089545933  1.890e-03       5.8      0.1      0.3      6.2     40.8
+    13  inner-solve          7.02      907  -2.902321635029823  1.403e-03       7.6      0.1      0.2      7.9     49.0
+    14  inner-solve          8.01      907  -2.902321635029823  1.403e-03       7.5      0.1      0.7      8.4     57.9
+    15  inner-solve          8.02     1867  -2.902715184593929  1.009e-03      17.9      0.8      0.4     19.2     77.4
+    16  inner-solve          8.03     2091  -2.902745870065834  9.785e-04      21.9      1.1      0.3     23.4    101.2
+    17  inner-solve          9.01     2091  -2.902745870065834  9.785e-04      21.6      1.1      1.4     24.2    126.5
+    18  inner-solve          9.02     3539  -2.902856587518898  8.678e-04      74.4      5.4      1.3     81.3    208.5
+    19  inner-solve          9.03     4087  -2.902861180337438  8.632e-04      93.7      6.5      1.2    101.5    311.0
+    20  inner-solve         10.01     4087  -2.902861180337438  8.632e-04      93.8      6.6      4.0    104.5    417.9
+    21  inner-solve         10.02     9069  -2.903048673032361  6.757e-04     353.7     57.8      7.9    420.3    839.5
+    22  inner-solve         10.03    17299  -2.903111276028613  6.131e-04    1717.6    374.7     10.1   2105.6   2947.8
+    23  kappa-final-solve   10.04    23257  -2.903233320482309  4.911e-04    4230.7   1004.8      0.0   5261.6   8215.3
+
+Saved M-record CSV: JH_He_Table51_M_records.csv
+
+Saved final adaptive basis/config only: JH_He_Table51_adaptive_basis_final_kappa10_M23257.mat
+>> 

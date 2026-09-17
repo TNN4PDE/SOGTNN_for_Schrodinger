@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # only on the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint_and_typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -e '.[testing]'
+    - name: Lint with flake8
+      run: |
+        flake8 .
+    - name: Lint with pylint
+      run: |
+        pylint --fail-under 9.5 ferminet
+    - name: Type check with pytype
+      run: |
+        pytype ferminet
+  build:
+    name: "build ${{ matrix.name-prefix }} (py ${{ matrix.python-version }} on ${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - name-prefix: "all tests"
+            python-version: '3.11'
+            os: ubuntu-latest
+            package-overrides: "none"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -e '.[testing]'
+        if [ ${{ matrix.package-overrides }} != none ]; then
+          pip install ${{ matrix.package-overrides }}
+        fi
+    - name: Run tests
+      run: |
+        python -m pytest
+    - name: Run multi-device tests
+      if: matrix.python-version == '3.11'
+      run: |
+        FERMINET_CHEX_N_CPU_DEVICES=2 python -m pytest ferminet/tests/train_test.py

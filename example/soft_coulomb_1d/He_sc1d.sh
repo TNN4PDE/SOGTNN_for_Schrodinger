@@ -1,0 +1,1 @@
+nohup python -u He_sc1d.py > He_sc1d.log 2>&1 &

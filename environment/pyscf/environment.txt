@@ -1,0 +1,31 @@
+PySCF
+=====
+Environment record date: 2026-09-16
+
+System
+------
+Operating system             Ubuntu 24.04.1 LTS
+Architecture                 x86_64
+Kernel                       Linux 6.11.0-29-generic
+glibc                        2.39
+Execution device             CPU
+CPU                          2 x Intel Xeon Gold 6530
+Physical cores               64
+Logical CPUs                 128
+System RAM                   Approximately 503 GiB
+
+Python libraries
+----------------
+Python                       3.11.13
+PySCF                        2.10.0
+NumPy                        2.4.4
+SciPy                        1.17.1
+h5py                         3.16.0
+basis-set-exchange            0.12
+pandas                       2.3.3
+
+Numerical libraries
+-------------------
+HDF5                         2.0.0
+NumPy OpenBLAS               0.3.31
+SciPy OpenBLAS               0.3.30

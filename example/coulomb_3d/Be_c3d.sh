@@ -1,0 +1,1 @@
+nohup python -u Be_c3d.py > Be_c3d.log 2>&1 &

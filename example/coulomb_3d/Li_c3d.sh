@@ -1,0 +1,1 @@
+nohup python -u Li_c3d.py > Li_c3d.log 2>&1 &

@@ -1,0 +1,5 @@
+system,n_logged,step_min,step_max,mean_E_all,naive_SE_all,blocking_SE_all,blocking_level_all,blocking_block_size_all,blocking_nblocks_all,mean_variance,mean_local_std,mean_pmove,mean_E_discard10pct,naive_SE_discard10pct,blocking_SE_discard10pct,blocking_level_discard10pct,blocking_block_size_discard10pct,blocking_nblocks_discard10pct
+He_singlet,10000,0,9999,-2.903722479232 ,3.67E-06,4.48E-06,7,128,78,0.000542197,0.023285116,0.519004744,-2.903720883925 ,3.85E-06,4.85E-06,9,512,17
+He_triplet,10000,0,9999,-2.175000995301 ,5.76E-06,6.91E-06,8,256,39,0.001377275,0.03711165,0.548330994,-2.175001775408 ,6.00E-06,7.47E-06,6,64,140
+Li_doublet,10000,0,9999,-7.477919999977 ,1.17E-05,1.31E-05,7,128,78,0.005678848,0.075358129,0.518075242,-7.477916679745 ,1.24E-05,1.50E-05,8,256,35
+Be_singlet,10000,0,9999,-14.667289843265 ,1.56E-05,1.65E-05,6,64,156,0.010078428,0.100391376,0.533888694,-14.667290665081 ,1.67E-05,1.95E-05,9,512,17

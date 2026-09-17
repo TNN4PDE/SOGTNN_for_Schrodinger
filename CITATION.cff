@@ -1,0 +1,65 @@
+cff-version: 1.2.0
+
+message: >-
+  This repository contains the code and data associated with both papers
+  listed in the references below. If you use SOG-TNN in your research,
+  please cite both papers and identify the software release or commit
+  used in your work.
+
+type: software
+title: "SOGTNN_for_Schr\"{o}dinger"
+
+authors:
+  - family-names: "Zhou"
+    given-names: "Qi"
+  - family-names: "Wu"
+    given-names: "Teng"
+
+license: MIT
+
+version: "1.0.0"
+date-released: "2026-09-17"
+
+references:
+  - type: article
+    title: "Sum-of-Gaussians tensor neural networks for high-dimensional Schrödinger equation"
+    authors:
+      - family-names: "Zhou"
+        given-names: "Qi"
+      - family-names: "Wu"
+        given-names: "Teng"
+      - family-names: "Liu"
+        given-names: "Jianghao"
+      - family-names: "Sun"
+        given-names: "Qingyuan"
+      - family-names: "Xie"
+        given-names: "Hehu"
+      - family-names: "Xu"
+        given-names: "Zhenli"
+    year: 2025
+    journal: "arXiv"
+    doi: "10.48550/arXiv.2508.10454"
+    url: "https://arxiv.org/abs/2508.10454"
+    notes: "Preprint. arXiv:2508.10454."
+
+  - type: article
+    title: "Spectral convergence of sum-of-Gaussians tensor neural networks for many-electron Schrödinger equation"
+    authors:
+      - family-names: "Wu"
+        given-names: "Teng"
+      - family-names: "Zhou"
+        given-names: "Qi"
+      - family-names: "Zheng"
+        given-names: "Huangjie"
+      - family-names: "Xie"
+        given-names: "Hehu"
+      - family-names: "Xu"
+        given-names: "Zhenli"
+    year: 2026
+    journal: "The Journal of Chemical Physics"
+    volume: 164
+    issue: 24
+    doi: "10.1063/5.0335566"
+    url: "https://doi.org/10.1063/5.0335566"
+    collection-title: "Machine Learning for Electronic Structure"
+    notes: "Article number: 244103."

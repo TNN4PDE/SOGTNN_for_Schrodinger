@@ -1,0 +1,1340 @@
+==========================================================================================================================
+PySCF classified Dunning benchmark v6
+threads = 8
+max_memory_mb = 0  (0 means PySCF default)
+max_fci_dim = 0  (0 means unlimited)
+max_cisd_dim = 0  (0 means unlimited)
+max_cc_nmo = 0  (0 means unlimited)
+run_fci = True, run_cisd = True, run_ccsd_t = True
+einsum patch = enabled: pyscf.lib.einsum -> numpy.einsum
+Size metrics include same-spin antisymmetrized excitation dimensions.
+He_triplet special case: CISD = CCSD = FCI, (T) = 0.
+==========================================================================================================================
+
+##########################################################################################################################
+Basis list for He_singlet:
+  cc-pvdz
+  cc-pvtz
+  cc-pvqz
+  cc-pv5z
+  cc-pv6z
+  aug-cc-pvdz
+  aug-cc-pvtz
+  aug-cc-pvqz
+  aug-cc-pv5z
+  aug-cc-pv6z
+##########################################################################################################################
+
+==========================================================================================================================
+System = He_singlet   | Basis = cc-pvdz           
+Family = cc-pVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 5, nbas = 3, lmax = 1, shells = {0: 2, 1: 1}
+  RHF  for FCI: E = -2.855160477242740 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 5, nalpha = 1, nbeta = 1, FCI_dim = 25
+  FCI: E = -2.887594831090937 | wall = 0.09s
+  RHF  for CISD: E = -2.855160477242740 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 25 = 1 + singles(8) + doubles(16)
+       blocks: S_a=4, S_b=4, D_aa=0, D_ab=16, D_bb=0
+  CISD: E = -2.887594831090937 | wall = 0.01s
+  RHF  for CC : E = -2.855160477242740 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 8, T2 = 16, CCSD_amp = 24
+       T2 blocks: aa=0, ab=16, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 24
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 20, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 56, T3_tensor = 4096
+  CCSD:    E = -2.887594831394733 | conv = True
+  (T):     E_T = -1.582947289993381e-20
+  CCSD(T): E = -2.887594831394733 | wall = 0.07s
+
+==========================================================================================================================
+System = He_singlet   | Basis = cc-pvtz           
+Family = cc-pVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 14, nbas = 6, lmax = 2, shells = {0: 3, 1: 2, 2: 1}
+  RHF  for FCI: E = -2.861153344784420 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 14, nalpha = 1, nbeta = 1, FCI_dim = 196
+  FCI: E = -2.900232169008978 | wall = 0.04s
+  RHF  for CISD: E = -2.861153344784420 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 196 = 1 + singles(26) + doubles(169)
+       blocks: S_a=13, S_b=13, D_aa=0, D_ab=169, D_bb=0
+  CISD: E = -2.900232169008986 | wall = 0.02s
+  RHF  for CC : E = -2.861153344784420 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 26, T2 = 169, CCSD_amp = 195
+       T2 blocks: aa=0, ab=169, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 195
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 182, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 533, T3_tensor = 140608
+  CCSD:    E = -2.900232168950901 | conv = True
+  (T):     E_T =  4.373589217248361e-20
+  CCSD(T): E = -2.900232168950901 | wall = 0.09s
+
+==========================================================================================================================
+System = He_singlet   | Basis = cc-pvqz           
+Family = cc-pVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 30, nbas = 10, lmax = 3, shells = {0: 4, 1: 3, 2: 2, 3: 1}
+  RHF  for FCI: E = -2.861514227228338 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 30, nalpha = 1, nbeta = 1, FCI_dim = 900
+  FCI: E = -2.902410877946182 | wall = 0.15s
+  RHF  for CISD: E = -2.861514227228338 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 900 = 1 + singles(58) + doubles(841)
+       blocks: S_a=29, S_b=29, D_aa=0, D_ab=841, D_bb=0
+  CISD: E = -2.902410877946167 | wall = 0.03s
+  RHF  for CC : E = -2.861514227228336 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 58, T2 = 841, CCSD_amp = 899
+       T2 blocks: aa=0, ab=841, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 899
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 870, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 2581, T3_tensor = 1560896
+  CCSD:    E = -2.902410878175000 | conv = True
+  (T):     E_T =  1.412901742462069e-20
+  CCSD(T): E = -2.902410878175000 | wall = 0.56s
+
+==========================================================================================================================
+System = He_singlet   | Basis = cc-pv5z           
+Family = cc-pVXZ, aug = none, zeta = 5Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 55, nbas = 15, lmax = 4, shells = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1}
+  RHF  for FCI: E = -2.861624834581911 | conv = True | wall = 0.06s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 55, nalpha = 1, nbeta = 1, FCI_dim = 3025
+  FCI: E = -2.903151884048996 | wall = 1.41s
+  RHF  for CISD: E = -2.861624834581907 | conv = True | wall = 0.05s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 3025 = 1 + singles(108) + doubles(2916)
+       blocks: S_a=54, S_b=54, D_aa=0, D_ab=2916, D_bb=0
+  CISD: E = -2.903151884048965 | wall = 0.11s
+  RHF  for CC : E = -2.861624834581914 | conv = True | wall = 0.04s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 108, T2 = 2916, CCSD_amp = 3024
+       T2 blocks: aa=0, ab=2916, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 3024
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 2970, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 8856, T3_tensor = 10077696
+  CCSD:    E = -2.903151884187429 | conv = True
+  (T):     E_T =  7.432129572734646e-20
+  CCSD(T): E = -2.903151884187429 | wall = 2.51s
+
+==========================================================================================================================
+System = He_singlet   | Basis = cc-pv6z           
+Family = cc-pVXZ, aug = none, zeta = 6Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 91, nbas = 6, lmax = 5, shells = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
+  RHF  for FCI: E = -2.861672966377269 | conv = True | wall = 0.32s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 91, nalpha = 1, nbeta = 1, FCI_dim = 8281
+  FCI: E = -2.903432118789085 | wall = 23.39s
+  RHF  for CISD: E = -2.861672966377269 | conv = True | wall = 0.35s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 8281 = 1 + singles(180) + doubles(8100)
+       blocks: S_a=90, S_b=90, D_aa=0, D_ab=8100, D_bb=0
+  CISD: E = -2.903432118789018 | wall = 0.73s
+  RHF  for CC : E = -2.861672966377268 | conv = True | wall = 0.34s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 180, T2 = 8100, CCSD_amp = 8280
+       T2 blocks: aa=0, ab=8100, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 8280
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 8190, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 24480, T3_tensor = 46656000
+  CCSD:    E = -2.903432118345043 | conv = True
+  (T):     E_T = -4.601843144550776e-20
+  CCSD(T): E = -2.903432118345043 | wall = 12.05s
+
+==========================================================================================================================
+System = He_singlet   | Basis = aug-cc-pvdz       
+Family = cc-pVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 9, nbas = 5, lmax = 1, shells = {0: 3, 1: 2}
+  RHF  for FCI: E = -2.855704667710430 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 9, nalpha = 1, nbeta = 1, FCI_dim = 81
+  FCI: E = -2.889548485365355 | wall = 0.02s
+  RHF  for CISD: E = -2.855704667710430 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 81 = 1 + singles(16) + doubles(64)
+       blocks: S_a=8, S_b=8, D_aa=0, D_ab=64, D_bb=0
+  CISD: E = -2.889548485365169 | wall = 0.01s
+  RHF  for CC : E = -2.855704667710430 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 16, T2 = 64, CCSD_amp = 80
+       T2 blocks: aa=0, ab=64, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 80
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 72, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 208, T3_tensor = 32768
+  CCSD:    E = -2.889548485065031 | conv = True
+  (T):     E_T = -1.008848592854338e-19
+  CCSD(T): E = -2.889548485065031 | wall = 0.07s
+
+==========================================================================================================================
+System = He_singlet   | Basis = aug-cc-pvtz       
+Family = cc-pVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 23, nbas = 9, lmax = 2, shells = {0: 4, 1: 3, 2: 2}
+  RHF  for FCI: E = -2.861183426115565 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 23, nalpha = 1, nbeta = 1, FCI_dim = 529
+  FCI: E = -2.900597922920598 | wall = 0.11s
+  RHF  for CISD: E = -2.861183426115565 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 529 = 1 + singles(44) + doubles(484)
+       blocks: S_a=22, S_b=22, D_aa=0, D_ab=484, D_bb=0
+  CISD: E = -2.900597922920535 | wall = 0.02s
+  RHF  for CC : E = -2.861183426115566 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 44, T2 = 484, CCSD_amp = 528
+       T2 blocks: aa=0, ab=484, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 528
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 506, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 1496, T3_tensor = 681472
+  CCSD:    E = -2.900597923336876 | conv = True
+  (T):     E_T =  1.275885400751432e-20
+  CCSD(T): E = -2.900597923336876 | wall = 0.24s
+
+==========================================================================================================================
+System = He_singlet   | Basis = aug-cc-pvqz       
+Family = cc-pVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 46, nbas = 14, lmax = 3, shells = {0: 5, 1: 4, 2: 3, 3: 2}
+  RHF  for FCI: E = -2.861521995632463 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 46, nalpha = 1, nbeta = 1, FCI_dim = 2116
+  FCI: E = -2.902533599417942 | wall = 0.60s
+  RHF  for CISD: E = -2.861521995632462 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 2116 = 1 + singles(90) + doubles(2025)
+       blocks: S_a=45, S_b=45, D_aa=0, D_ab=2025, D_bb=0
+  CISD: E = -2.902533599417820 | wall = 0.06s
+  RHF  for CC : E = -2.861521995632464 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 90, T2 = 2025, CCSD_amp = 2115
+       T2 blocks: aa=0, ab=2025, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 2115
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 2070, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 6165, T3_tensor = 5832000
+  CCSD:    E = -2.902533599563590 | conv = True
+  (T):     E_T = -3.676217907722372e-20
+  CCSD(T): E = -2.902533599563590 | wall = 1.46s
+
+==========================================================================================================================
+System = He_singlet   | Basis = aug-cc-pv5z       
+Family = cc-pVXZ, aug = aug, zeta = 5Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 80, nbas = 20, lmax = 4, shells = {0: 6, 1: 5, 2: 4, 3: 3, 4: 2}
+  RHF  for FCI: E = -2.861626929245816 | conv = True | wall = 0.10s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 80, nalpha = 1, nbeta = 1, FCI_dim = 6400
+  FCI: E = -2.903200529539670 | wall = 10.31s
+  RHF  for CISD: E = -2.861626929245819 | conv = True | wall = 0.09s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 6400 = 1 + singles(158) + doubles(6241)
+       blocks: S_a=79, S_b=79, D_aa=0, D_ab=6241, D_bb=0
+  CISD: E = -2.903200529539371 | wall = 0.45s
+  RHF  for CC : E = -2.861626929245821 | conv = True | wall = 0.09s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 158, T2 = 6241, CCSD_amp = 6399
+       T2 blocks: aa=0, ab=6241, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 6399
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 6320, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 18881, T3_tensor = 31554496
+  CCSD:    E = -2.903200529602529 | conv = True
+  (T):     E_T =  7.313093733001887e-20
+  CCSD(T): E = -2.903200529602529 | wall = 8.73s
+
+==========================================================================================================================
+System = He_singlet   | Basis = aug-cc-pv6z       
+Family = cc-pVXZ, aug = aug, zeta = 6Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (1, 1)
+  AO basis: nao = 127, nbas = 12, lmax = 5, shells = {0: 2, 1: 2, 2: 2, 3: 2, 4: 2, 5: 2}
+  RHF  for FCI: E = -2.861673128997314 | conv = True | wall = 1.73s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 127, nalpha = 1, nbeta = 1, FCI_dim = 16129
+  FCI: E = -2.903455353253166 | wall = 177.47s
+  RHF  for CISD: E = -2.861673128997316 | conv = True | wall = 1.85s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 16129 = 1 + singles(252) + doubles(15876)
+       blocks: S_a=126, S_b=126, D_aa=0, D_ab=15876, D_bb=0
+  CISD: E = -2.903455353252527 | wall = 7.72s
+  RHF  for CC : E = -2.861673128997309 | conv = True | wall = 1.73s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 252, T2 = 15876, CCSD_amp = 16128
+       T2 blocks: aa=0, ab=15876, bb=0
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 16128
+       T3 blocks: aaa=0, aab=0, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 16002, T3_spatial = 0
+  Tensor proxy: CCSD_amp_tensor = 47880, T3_tensor = 128024064
+  CCSD:    E = -2.903455353146323 | conv = True
+  (T):     E_T =  9.451964355429852e-21
+  CCSD(T): E = -2.903455353146323 | wall = 39.84s
+
+##########################################################################################################################
+Basis list for He_triplet:
+  cc-pvdz
+  cc-pvtz
+  cc-pvqz
+  cc-pv5z
+  cc-pv6z
+  aug-cc-pvdz
+  aug-cc-pvtz
+  aug-cc-pvqz
+  aug-cc-pv5z
+  aug-cc-pv6z
+##########################################################################################################################
+
+==========================================================================================================================
+System = He_triplet   | Basis = cc-pvdz           
+Family = cc-pVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 5, nbas = 3, lmax = 1, shells = {0: 2, 1: 1}
+  ROHF for FCI: E = -1.401163276701306 | conv = True | wall = 0.02s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 5, nalpha = 2, nbeta = 0, FCI_dim = 10
+  FCI: E = -1.401163276701307 | wall = 0.02s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 10 = 1 + singles(6) + doubles(3)
+  CISD: E = -1.4011632767013071 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 6, T2 = 3, CCSD_amp = 9
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 9
+  Tensor proxy: CCSD_amp_tensor = 42, T3_tensor = 4096
+  CCSD:    E = -1.4011632767013071 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -1.4011632767013071
+
+==========================================================================================================================
+System = He_triplet   | Basis = cc-pvtz           
+Family = cc-pVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 14, nbas = 6, lmax = 2, shells = {0: 3, 1: 2, 2: 1}
+  ROHF for FCI: E = -1.914168558617273 | conv = True | wall = 0.03s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 14, nalpha = 2, nbeta = 0, FCI_dim = 91
+  FCI: E = -1.915086252114721 | wall = 0.02s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 91 = 1 + singles(24) + doubles(66)
+  CISD: E = -1.9150862521147207 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 24, T2 = 66, CCSD_amp = 90
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 90
+  Tensor proxy: CCSD_amp_tensor = 600, T3_tensor = 140608
+  CCSD:    E = -1.9150862521147207 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -1.9150862521147207
+
+==========================================================================================================================
+System = He_triplet   | Basis = cc-pvqz           
+Family = cc-pVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 30, nbas = 10, lmax = 3, shells = {0: 4, 1: 3, 2: 2, 3: 1}
+  ROHF for FCI: E = -1.991596072769454 | conv = True | wall = 0.03s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 30, nalpha = 2, nbeta = 0, FCI_dim = 435
+  FCI: E = -1.993037934107123 | wall = 0.14s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 435 = 1 + singles(56) + doubles(378)
+  CISD: E = -1.9930379341071227 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 56, T2 = 378, CCSD_amp = 434
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 434
+  Tensor proxy: CCSD_amp_tensor = 3192, T3_tensor = 1560896
+  CCSD:    E = -1.9930379341071227 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -1.9930379341071227
+
+==========================================================================================================================
+System = He_triplet   | Basis = cc-pv5z           
+Family = cc-pVXZ, aug = none, zeta = 5Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 55, nbas = 15, lmax = 4, shells = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1}
+  ROHF for FCI: E = -2.040342424655149 | conv = True | wall = 0.06s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 55, nalpha = 2, nbeta = 0, FCI_dim = 1485
+  FCI: E = -2.041940639571242 | wall = 2.07s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 1485 = 1 + singles(106) + doubles(1378)
+  CISD: E = -2.041940639571242 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 106, T2 = 1378, CCSD_amp = 1484
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 1484
+  Tensor proxy: CCSD_amp_tensor = 11342, T3_tensor = 10077696
+  CCSD:    E = -2.041940639571242 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.041940639571242
+
+==========================================================================================================================
+System = He_triplet   | Basis = cc-pv6z           
+Family = cc-pVXZ, aug = none, zeta = 6Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 91, nbas = 6, lmax = 5, shells = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
+  ROHF for FCI: E = -2.094271730322593 | conv = True | wall = 1.48s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 91, nalpha = 2, nbeta = 0, FCI_dim = 4095
+  FCI: E = -2.095736413395112 | wall = 37.91s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 4095 = 1 + singles(178) + doubles(3916)
+  CISD: E = -2.0957364133951115 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 178, T2 = 3916, CCSD_amp = 4094
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 4094
+  Tensor proxy: CCSD_amp_tensor = 31862, T3_tensor = 46656000
+  CCSD:    E = -2.0957364133951115 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.0957364133951115
+
+==========================================================================================================================
+System = He_triplet   | Basis = aug-cc-pvdz       
+Family = cc-pVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 9, nbas = 5, lmax = 1, shells = {0: 3, 1: 2}
+  ROHF for FCI: E = -2.150189165923245 | conv = True | wall = 0.03s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 9, nalpha = 2, nbeta = 0, FCI_dim = 36
+  FCI: E = -2.151147870862891 | wall = 0.02s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 36 = 1 + singles(14) + doubles(21)
+  CISD: E = -2.1511478708628915 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 14, T2 = 21, CCSD_amp = 35
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 35
+  Tensor proxy: CCSD_amp_tensor = 210, T3_tensor = 32768
+  CCSD:    E = -2.1511478708628915 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.1511478708628915
+
+==========================================================================================================================
+System = He_triplet   | Basis = aug-cc-pvtz       
+Family = cc-pVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 23, nbas = 9, lmax = 2, shells = {0: 4, 1: 3, 2: 2}
+  ROHF for FCI: E = -2.168889565276030 | conv = True | wall = 0.03s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 23, nalpha = 2, nbeta = 0, FCI_dim = 253
+  FCI: E = -2.169894389124561 | wall = 0.05s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 253 = 1 + singles(42) + doubles(210)
+  CISD: E = -2.169894389124561 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 42, T2 = 210, CCSD_amp = 252
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 252
+  Tensor proxy: CCSD_amp_tensor = 1806, T3_tensor = 681472
+  CCSD:    E = -2.169894389124561 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.169894389124561
+
+==========================================================================================================================
+System = He_triplet   | Basis = aug-cc-pvqz       
+Family = cc-pVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 46, nbas = 14, lmax = 3, shells = {0: 5, 1: 4, 2: 3, 3: 2}
+  ROHF for FCI: E = -2.171178823182152 | conv = True | wall = 0.05s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 46, nalpha = 2, nbeta = 0, FCI_dim = 1035
+  FCI: E = -2.172216318749861 | wall = 0.75s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 1035 = 1 + singles(88) + doubles(946)
+  CISD: E = -2.172216318749861 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 88, T2 = 946, CCSD_amp = 1034
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 1034
+  Tensor proxy: CCSD_amp_tensor = 7832, T3_tensor = 5832000
+  CCSD:    E = -2.172216318749861 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.172216318749861
+
+==========================================================================================================================
+System = He_triplet   | Basis = aug-cc-pv5z       
+Family = cc-pVXZ, aug = aug, zeta = 5Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 80, nbas = 20, lmax = 4, shells = {0: 6, 1: 5, 2: 4, 3: 3, 4: 2}
+  ROHF for FCI: E = -2.171817819885813 | conv = True | wall = 1.36s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 80, nalpha = 2, nbeta = 0, FCI_dim = 3160
+  FCI: E = -2.172866458065406 | wall = 19.24s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 3160 = 1 + singles(156) + doubles(3003)
+  CISD: E = -2.1728664580654065 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 156, T2 = 3003, CCSD_amp = 3159
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 3159
+  Tensor proxy: CCSD_amp_tensor = 24492, T3_tensor = 31554496
+  CCSD:    E = -2.1728664580654065 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.1728664580654065
+
+==========================================================================================================================
+System = He_triplet   | Basis = aug-cc-pv6z       
+Family = cc-pVXZ, aug = aug, zeta = 6Z
+==========================================================================================================================
+  nelec = 2, alpha/beta = (2, 0)
+  AO basis: nao = 127, nbas = 12, lmax = 5, shells = {0: 2, 1: 2, 2: 2, 3: 2, 4: 2, 5: 2}
+  ROHF for FCI: E = -2.172405400617538 | conv = True | wall = 3.26s
+       <S^2> = 2.00000000, 2S+1 = 3.00000000
+  FCI size: norb = 127, nalpha = 2, nbeta = 0, FCI_dim = 8001
+  FCI: E = -2.173442360412123 | wall = 365.57s
+  Special treatment: two-electron high-spin sector.
+  Use finite-basis identities: CISD = CCSD = FCI, and (T) = 0.
+  CISD independent antisym size: CISD_dim = 8001 = 1 + singles(250) + doubles(7750)
+  CISD: E = -2.173442360412123 | status = fci_equivalent_two_electron_highspin
+  CCSD independent antisym size: T1 = 250, T2 = 7750, CCSD_amp = 8000
+  CCSD(T) independent triples size: T3 = 0, CCSD+T3 = 8000
+  Tensor proxy: CCSD_amp_tensor = 62750, T3_tensor = 128024064
+  CCSD:    E = -2.173442360412123 | status = fci_equivalent_two_electron_highspin
+  (T):     E_T = 0.0
+  CCSD(T): E = -2.173442360412123
+
+##########################################################################################################################
+Basis list for Li_doublet:
+  cc-pvdz
+  cc-pvtz
+  cc-pvqz
+  cc-pv5z
+  cc-pcvdz
+  cc-pcvtz
+  cc-pcvqz
+  cc-pcv5z
+  aug-cc-pvdz
+  aug-cc-pvtz
+  aug-cc-pvqz
+  aug-cc-pv5z
+  aug-cc-pcvdz
+  aug-cc-pcvtz
+  aug-cc-pcvqz
+  aug-cc-pcv5z
+##########################################################################################################################
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pvdz           
+Family = cc-pVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 14, nbas = 5, lmax = 2, shells = {0: 2, 1: 2, 2: 1}
+  ROHF for FCI: E = -7.432419879671087 | conv = True | wall = 0.03s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 14, nalpha = 2, nbeta = 1, FCI_dim = 1274
+  FCI: E = -7.432637514964876 | wall = 0.10s
+  UHF  for CISD: E = -7.432420527595772 | conv = True | wall = 0.03s
+       <S^2> = 0.75000054, 2S+1 = 2.00000054
+  CISD independent antisym size: CISD_dim = 416 = 1 + singles(37) + doubles(378)
+       blocks: S_a=24, S_b=13, D_aa=66, D_ab=312, D_bb=0
+  CISD: E = -7.364798189631924 | wall = 0.04s
+  UHF  for CC : E = -7.432420527595770 | conv = True | wall = 0.03s
+       <S^2> = 0.75000054, 2S+1 = 2.00000054
+  CCSD independent antisym size: T1 = 37, T2 = 378, CCSD_amp = 415
+       T2 blocks: aa=66, ab=312, bb=0
+  CCSD(T) independent triples size: T3 = 858, CCSD+T3 = 1273
+       T3 blocks: aaa=0, aab=858, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 600, T3_spatial = 13824
+  Tensor proxy: CCSD_amp_tensor = 1094, T3_tensor = 421875
+  CCSD:    E = -7.432637296014873 | conv = True
+  (T):     E_T = -2.371594619562968e-07
+  CCSD(T): E = -7.432637533174335 | wall = 0.27s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pvtz           
+Family = cc-pVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 30, nbas = 9, lmax = 3, shells = {0: 3, 1: 3, 2: 2, 3: 1}
+  ROHF for FCI: E = -7.432678855852966 | conv = True | wall = 0.03s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 30, nalpha = 2, nbeta = 1, FCI_dim = 13050
+  FCI: E = -7.446068921286050 | wall = 1.72s
+  UHF  for CISD: E = -7.432702051224544 | conv = True | wall = 0.12s
+       <S^2> = 0.75001434, 2S+1 = 2.00001434
+  CISD independent antisym size: CISD_dim = 2088 = 1 + singles(85) + doubles(2002)
+       blocks: S_a=56, S_b=29, D_aa=378, D_ab=1624, D_bb=0
+  CISD: E = -7.446050163468829 | wall = 0.07s
+  UHF  for CC : E = -7.432702051224549 | conv = True | wall = 0.03s
+       <S^2> = 0.75001434, 2S+1 = 2.00001434
+  CCSD independent antisym size: T1 = 85, T2 = 2002, CCSD_amp = 2087
+       T2 blocks: aa=378, ab=1624, bb=0
+  CCSD(T) independent triples size: T3 = 10962, CCSD+T3 = 13049
+       T3 blocks: aaa=0, aab=10962, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 3192, T3_spatial = 175616
+  Tensor proxy: CCSD_amp_tensor = 5686, T3_tensor = 5000211
+  CCSD:    E = -7.446049909360418 | conv = True
+  (T):     E_T = -1.599278382404444e-05
+  CCSD(T): E = -7.446065902144243 | wall = 2.92s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pvqz           
+Family = cc-pVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 55, nbas = 14, lmax = 4, shells = {0: 4, 1: 4, 2: 3, 3: 2, 4: 1}
+  ROHF for FCI: E = -7.432695138245700 | conv = True | wall = 0.06s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 55, nalpha = 2, nbeta = 1, FCI_dim = 81675
+  FCI: E = -7.449832450865927 | wall = 33.87s
+  UHF  for CISD: E = -7.432718431702341 | conv = True | wall = 0.16s
+       <S^2> = 0.75001471, 2S+1 = 2.00001471
+  CISD independent antisym size: CISD_dim = 7263 = 1 + singles(160) + doubles(7102)
+       blocks: S_a=106, S_b=54, D_aa=1378, D_ab=5724, D_bb=0
+  CISD: E = -7.449798405067912 | wall = 0.46s
+  UHF  for CC : E = -7.432718431702344 | conv = True | wall = 0.07s
+       <S^2> = 0.75001471, 2S+1 = 2.00001471
+  CCSD independent antisym size: T1 = 160, T2 = 7102, CCSD_amp = 7262
+       T2 blocks: aa=1378, ab=5724, bb=0
+  CCSD(T) independent triples size: T3 = 74412, CCSD+T3 = 81674
+       T3 blocks: aaa=0, aab=74412, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 11342, T3_spatial = 1191016
+  Tensor proxy: CCSD_amp_tensor = 20036, T3_tensor = 33076161
+  CCSD:    E = -7.449798168331218 | conv = True
+  (T):     E_T = -2.890529025783276e-05
+  CCSD(T): E = -7.449827073621476 | wall = 19.17s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pv5z           
+Family = cc-pVXZ, aug = none, zeta = 5Z
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 91, nbas = 20, lmax = 5, shells = {0: 5, 1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
+  ROHF for FCI: E = -7.432722635310038 | conv = True | wall = 1.42s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 91, nalpha = 2, nbeta = 1, FCI_dim = 372645
+  FCI: E = -7.459912732349030 | wall = 1168.77s
+  UHF  for CISD: E = -7.432746005719561 | conv = True | wall = 2.22s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CISD independent antisym size: CISD_dim = 20205 = 1 + singles(268) + doubles(19936)
+       blocks: S_a=178, S_b=90, D_aa=3916, D_ab=16020, D_bb=0
+  CISD: E = -7.459877209138158 | wall = 4.03s
+  UHF  for CC : E = -7.432746005719557 | conv = True | wall = 2.23s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CCSD independent antisym size: T1 = 268, T2 = 19936, CCSD_amp = 20204
+       T2 blocks: aa=3916, ab=16020, bb=0
+  CCSD(T) independent triples size: T3 = 352440, CCSD+T3 = 372644
+       T3 blocks: aaa=0, aab=352440, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 31862, T3_spatial = 5639752
+  Tensor proxy: CCSD_amp_tensor = 56072, T3_tensor = 154854153
+  CCSD:    E = -7.459877727596687 | conv = True
+  (T):     E_T = -3.011139650125114e-05
+  CCSD(T): E = -7.459907838993188 | wall = 119.81s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pcvdz          
+Family = cc-pCVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 18, nbas = 7, lmax = 2, shells = {0: 3, 1: 3, 2: 1}
+  ROHF for FCI: E = -7.432419883779414 | conv = True | wall = 0.03s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 18, nalpha = 2, nbeta = 1, FCI_dim = 2754
+  FCI: E = -7.466025164461804 | wall = 0.10s
+  UHF  for CISD: E = -7.432440391254490 | conv = True | wall = 0.03s
+       <S^2> = 0.75001012, 2S+1 = 2.00001012
+  CISD independent antisym size: CISD_dim = 714 = 1 + singles(49) + doubles(664)
+       blocks: S_a=32, S_b=17, D_aa=120, D_ab=544, D_bb=0
+  CISD: E = -7.466020706686398 | wall = 0.04s
+  UHF  for CC : E = -7.432440391254492 | conv = True | wall = 0.03s
+       <S^2> = 0.75001012, 2S+1 = 2.00001012
+  CCSD independent antisym size: T1 = 49, T2 = 664, CCSD_amp = 713
+       T2 blocks: aa=120, ab=544, bb=0
+  CCSD(T) independent triples size: T3 = 2040, CCSD+T3 = 2753
+       T3 blocks: aaa=0, aab=2040, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 1056, T3_spatial = 32768
+  Tensor proxy: CCSD_amp_tensor = 1906, T3_tensor = 970299
+  CCSD:    E = -7.466020793413324 | conv = True
+  (T):     E_T = -3.709690060914092e-06
+  CCSD(T): E = -7.466024503103385 | wall = 0.57s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pcvtz          
+Family = cc-pCVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 43, nbas = 14, lmax = 3, shells = {0: 5, 1: 5, 2: 3, 3: 1}
+  ROHF for FCI: E = -7.432679265467745 | conv = True | wall = 0.04s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 43, nalpha = 2, nbeta = 1, FCI_dim = 38829
+  FCI: E = -7.474251419701286 | wall = 7.62s
+  UHF  for CISD: E = -7.432702938337033 | conv = True | wall = 0.15s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CISD independent antisym size: CISD_dim = 4389 = 1 + singles(124) + doubles(4264)
+       blocks: S_a=82, S_b=42, D_aa=820, D_ab=3444, D_bb=0
+  CISD: E = -7.474224453692792 | wall = 0.17s
+  UHF  for CC : E = -7.432702938337032 | conv = True | wall = 0.04s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CCSD independent antisym size: T1 = 124, T2 = 4264, CCSD_amp = 4388
+       T2 blocks: aa=820, ab=3444, bb=0
+  CCSD(T) independent triples size: T3 = 34440, CCSD+T3 = 38828
+       T3 blocks: aaa=0, aab=34440, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 6806, T3_spatial = 551368
+  Tensor proxy: CCSD_amp_tensor = 12056, T3_tensor = 15438249
+  CCSD:    E = -7.474225798814367 | conv = True
+  (T):     E_T = -2.202567289877649e-05
+  CCSD(T): E = -7.474247824487266 | wall = 9.96s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pcvqz          
+Family = cc-pCVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 84, nbas = 23, lmax = 4, shells = {0: 7, 1: 7, 2: 5, 3: 3, 4: 1}
+  ROHF for FCI: E = -7.432695248520363 | conv = True | wall = 1.23s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 84, nalpha = 2, nbeta = 1, FCI_dim = 292824
+  FCI: E = -7.476372869918237 | wall = 665.90s
+  UHF  for CISD: E = -7.432719216971559 | conv = True | wall = 2.12s
+       <S^2> = 0.75001568, 2S+1 = 2.00001568
+  CISD independent antisym size: CISD_dim = 17181 = 1 + singles(247) + doubles(16933)
+       blocks: S_a=164, S_b=83, D_aa=3321, D_ab=13612, D_bb=0
+  CISD: E = -7.476330717186775 | wall = 3.57s
+  UHF  for CC : E = -7.432719216971556 | conv = True | wall = 2.07s
+       <S^2> = 0.75001568, 2S+1 = 2.00001568
+  CCSD independent antisym size: T1 = 247, T2 = 16933, CCSD_amp = 17180
+       T2 blocks: aa=3321, ab=13612, bb=0
+  CCSD(T) independent triples size: T3 = 275643, CCSD+T3 = 292823
+       T3 blocks: aaa=0, aab=275643, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 27060, T3_spatial = 4410944
+  Tensor proxy: CCSD_amp_tensor = 47644, T3_tensor = 121287375
+  CCSD:    E = -7.476332992847551 | conv = True
+  (T):     E_T = -3.477956355287396e-05
+  CCSD(T): E = -7.476367772411104 | wall = 90.06s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = cc-pcv5z          
+Family = cc-pCVXZ, aug = none, zeta = 5Z
+==========================================================================================================================
+  Build failed. Skip this basis.
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pvdz       
+Family = cc-pVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 23, nbas = 8, lmax = 2, shells = {0: 3, 1: 3, 2: 2}
+  ROHF for FCI: E = -7.432425072801433 | conv = True | wall = 0.03s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 23, nalpha = 2, nbeta = 1, FCI_dim = 5819
+  FCI: E = -7.432659338286991 | wall = 0.19s
+  UHF  for CISD: E = -7.432425720562772 | conv = True | wall = 0.03s
+       <S^2> = 0.75000054, 2S+1 = 2.00000054
+  CISD independent antisym size: CISD_dim = 1199 = 1 + singles(64) + doubles(1134)
+       blocks: S_a=42, S_b=22, D_aa=210, D_ab=924, D_bb=0
+  CISD: E = -7.364831912632930 | wall = 0.07s
+  UHF  for CC : E = -7.432425720562771 | conv = True | wall = 0.03s
+       <S^2> = 0.75000054, 2S+1 = 2.00000054
+  CCSD independent antisym size: T1 = 64, T2 = 1134, CCSD_amp = 1198
+       T2 blocks: aa=210, ab=924, bb=0
+  CCSD(T) independent triples size: T3 = 4620, CCSD+T3 = 5818
+       T3 blocks: aaa=0, aab=4620, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 1806, T3_spatial = 74088
+  Tensor proxy: CCSD_amp_tensor = 3236, T3_tensor = 2146689
+  CCSD:    E = -7.432659098272451 | conv = True
+  (T):     E_T = -2.595916453811296e-07
+  CCSD(T): E = -7.432659357864096 | wall = 1.26s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pvtz       
+Family = cc-pVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 46, nbas = 13, lmax = 3, shells = {0: 4, 1: 4, 2: 3, 3: 2}
+  ROHF for FCI: E = -7.432682117645558 | conv = True | wall = 0.04s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 46, nalpha = 2, nbeta = 1, FCI_dim = 47610
+  FCI: E = -7.446157917191567 | wall = 10.95s
+  UHF  for CISD: E = -7.432705326701303 | conv = True | wall = 0.16s
+       <S^2> = 0.75001436, 2S+1 = 2.00001436
+  CISD independent antisym size: CISD_dim = 5040 = 1 + singles(133) + doubles(4906)
+       blocks: S_a=88, S_b=45, D_aa=946, D_ab=3960, D_bb=0
+  CISD: E = -7.446138690451523 | wall = 0.21s
+  UHF  for CC : E = -7.432705326701303 | conv = True | wall = 0.05s
+       <S^2> = 0.75001436, 2S+1 = 2.00001436
+  CCSD independent antisym size: T1 = 133, T2 = 4906, CCSD_amp = 5039
+       T2 blocks: aa=946, ab=3960, bb=0
+  CCSD(T) independent triples size: T3 = 42570, CCSD+T3 = 47609
+       T3 blocks: aaa=0, aab=42570, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 7832, T3_spatial = 681472
+  Tensor proxy: CCSD_amp_tensor = 13862, T3_tensor = 19034163
+  CCSD:    E = -7.446138434154040 | conv = True
+  (T):     E_T = -1.640498272476346e-05
+  CCSD(T): E = -7.446154839136765 | wall = 12.69s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pvqz       
+Family = cc-pVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 80, nbas = 19, lmax = 4, shells = {0: 5, 1: 5, 2: 4, 3: 3, 4: 2}
+  ROHF for FCI: E = -7.432695429194082 | conv = True | wall = 1.20s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 80, nalpha = 2, nbeta = 1, FCI_dim = 252800
+  FCI: E = -7.449919760206255 | wall = 428.70s
+  UHF  for CISD: E = -7.432718717046832 | conv = True | wall = 2.37s
+       <S^2> = 0.75001472, 2S+1 = 2.00001472
+  CISD independent antisym size: CISD_dim = 15563 = 1 + singles(235) + doubles(15327)
+       blocks: S_a=156, S_b=79, D_aa=3003, D_ab=12324, D_bb=0
+  CISD: E = -7.449885649625129 | wall = 2.81s
+  UHF  for CC : E = -7.432718717046826 | conv = True | wall = 2.38s
+       <S^2> = 0.75001472, 2S+1 = 2.00001472
+  CCSD independent antisym size: T1 = 235, T2 = 15327, CCSD_amp = 15562
+       T2 blocks: aa=3003, ab=12324, bb=0
+  CCSD(T) independent triples size: T3 = 237237, CCSD+T3 = 252799
+       T3 blocks: aaa=0, aab=237237, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 24492, T3_spatial = 3796416
+  Tensor proxy: CCSD_amp_tensor = 43136, T3_tensor = 104487111
+  CCSD:    E = -7.449885420783930 | conv = True
+  (T):     E_T = -2.897246077627341e-05
+  CCSD(T): E = -7.449914393244706 | wall = 64.89s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pv5z       
+Family = cc-pVXZ, aug = aug, zeta = 5Z
+==========================================================================================================================
+  Build failed. Skip this basis.
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pcvdz      
+Family = cc-pCVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 27, nbas = 8, lmax = 2, shells = {0: 3, 1: 3, 2: 2}
+  ROHF for FCI: E = -7.432425205527088 | conv = True | wall = 0.03s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 27, nalpha = 2, nbeta = 1, FCI_dim = 9477
+  FCI: E = -7.466064442868761 | wall = 0.34s
+  UHF  for CISD: E = -7.432445829141140 | conv = True | wall = 0.03s
+       <S^2> = 0.75001028, 2S+1 = 2.00001028
+  CISD independent antisym size: CISD_dim = 1677 = 1 + singles(76) + doubles(1600)
+       blocks: S_a=50, S_b=26, D_aa=300, D_ab=1300, D_bb=0
+  CISD: E = -7.466059662529259 | wall = 0.06s
+  UHF  for CC : E = -7.432445829141146 | conv = True | wall = 0.03s
+       <S^2> = 0.75001028, 2S+1 = 2.00001028
+  CCSD independent antisym size: T1 = 76, T2 = 1600, CCSD_amp = 1676
+       T2 blocks: aa=300, ab=1300, bb=0
+  CCSD(T) independent triples size: T3 = 7800, CCSD+T3 = 9476
+       T3 blocks: aaa=0, aab=7800, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 2550, T3_spatial = 125000
+  Tensor proxy: CCSD_amp_tensor = 4552, T3_tensor = 3581577
+  CCSD:    E = -7.466059758047494 | conv = True
+  (T):     E_T = -3.983875575260707e-06
+  CCSD(T): E = -7.466063741923069 | wall = 2.27s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pcvtz      
+Family = cc-pCVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 59, nbas = 13, lmax = 3, shells = {0: 4, 1: 4, 2: 3, 3: 2}
+  ROHF for FCI: E = -7.432682346968133 | conv = True | wall = 0.06s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 59, nalpha = 2, nbeta = 1, FCI_dim = 100949
+  FCI: E = -7.474268047922652 | wall = 65.77s
+  UHF  for CISD: E = -7.432706020099576 | conv = True | wall = 0.17s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CISD independent antisym size: CISD_dim = 8381 = 1 + singles(172) + doubles(8208)
+       blocks: S_a=114, S_b=58, D_aa=1596, D_ab=6612, D_bb=0
+  CISD: E = -7.474240729542113 | wall = 0.57s
+  UHF  for CC : E = -7.432706020099572 | conv = True | wall = 0.07s
+       <S^2> = 0.75001538, 2S+1 = 2.00001538
+  CCSD independent antisym size: T1 = 172, T2 = 8208, CCSD_amp = 8380
+       T2 blocks: aa=1596, ab=6612, bb=0
+  CCSD(T) independent triples size: T3 = 92568, CCSD+T3 = 100948
+       T3 blocks: aaa=0, aab=92568, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 13110, T3_spatial = 1481544
+  Tensor proxy: CCSD_amp_tensor = 23144, T3_tensor = 41063625
+  CCSD:    E = -7.474242100948633 | conv = True
+  (T):     E_T = -2.231511664587801e-05
+  CCSD(T): E = -7.474264416065279 | wall = 23.26s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pcvqz      
+Family = cc-pCVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 3, alpha/beta = (2, 1)
+  AO basis: nao = 109, nbas = 19, lmax = 4, shells = {0: 5, 1: 5, 2: 4, 3: 3, 4: 2}
+  ROHF for FCI: E = -7.432695542353539 | conv = True | wall = 2.36s
+       <S^2> = 0.75000000, 2S+1 = 2.00000000
+  FCI size: norb = 109, nalpha = 2, nbeta = 1, FCI_dim = 641574
+  FCI: E = -7.476374956081413 | wall = 4540.25s
+  UHF  for CISD: E = -7.432719508316090 | conv = True | wall = 2.53s
+       <S^2> = 0.75001567, 2S+1 = 2.00001567
+  CISD independent antisym size: CISD_dim = 29106 = 1 + singles(322) + doubles(28783)
+       blocks: S_a=214, S_b=108, D_aa=5671, D_ab=23112, D_bb=0
+  CISD: E = -7.476332753919967 | wall = 7.62s
+  UHF  for CC : E = -7.432719508316091 | conv = True | wall = 2.47s
+       <S^2> = 0.75001567, 2S+1 = 2.00001567
+  CCSD independent antisym size: T1 = 322, T2 = 28783, CCSD_amp = 29105
+       T2 blocks: aa=5671, ab=23112, bb=0
+  CCSD(T) independent triples size: T3 = 612468, CCSD+T3 = 641573
+       T3 blocks: aaa=0, aab=612468, abb=0, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 46010, T3_spatial = 9800344
+  Tensor proxy: CCSD_amp_tensor = 80894, T3_tensor = 268336125
+  CCSD:    E = -7.476335040788431 | conv = True
+  (T):     E_T = -3.482292683704619e-05
+  CCSD(T): E = -7.476369863715268 | wall = 188.44s
+
+==========================================================================================================================
+System = Li_doublet   | Basis = aug-cc-pcv5z      
+Family = cc-pCVXZ, aug = aug, zeta = 5Z
+==========================================================================================================================
+  Build failed. Skip this basis.
+
+##########################################################################################################################
+Basis list for Be_singlet:
+  cc-pvdz
+  cc-pvtz
+  cc-pvqz
+  cc-pcvdz
+  cc-pcvtz
+  cc-pcvqz
+  aug-cc-pvdz
+  aug-cc-pvtz
+  aug-cc-pvqz
+  aug-cc-pcvdz
+  aug-cc-pcvtz
+  aug-cc-pcvqz
+##########################################################################################################################
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pvdz           
+Family = cc-pVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 14, nbas = 5, lmax = 2, shells = {0: 2, 1: 2, 2: 1}
+  RHF  for FCI: E = -14.572337630953378 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 14, nalpha = 2, nbeta = 2, FCI_dim = 8281
+  FCI: E = -14.617409506553738 | wall = 0.11s
+  RHF  for CISD: E = -14.572337630953378 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 757 = 1 + singles(48) + doubles(708)
+       blocks: S_a=24, S_b=24, D_aa=66, D_ab=576, D_bb=66
+  CISD: E = -14.617355787674942 | wall = 0.02s
+  RHF  for CC : E = -14.572337630953374 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 48, T2 = 708, CCSD_amp = 756
+       T2 blocks: aa=66, ab=576, bb=66
+  CCSD(T) independent triples size: T3 = 3168, CCSD+T3 = 3924
+       T3 blocks: aaa=0, aab=1584, abb=1584, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 600, T3_spatial = 13824
+  Tensor proxy: CCSD_amp_tensor = 1776, T3_tensor = 884736
+  CCSD:    E = -14.617369014299719 | conv = True
+  (T):     E_T = -3.807737995786599e-05
+  CCSD(T): E = -14.617407091679677 | wall = 0.09s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pvtz           
+Family = cc-pVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 30, nbas = 9, lmax = 3, shells = {0: 3, 1: 3, 2: 2, 3: 1}
+  RHF  for FCI: E = -14.572873468246396 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 30, nalpha = 2, nbeta = 2, FCI_dim = 189225
+  FCI: E = -14.623809934334263 | wall = 9.33s
+  RHF  for CISD: E = -14.572873468246378 | conv = True | wall = 0.14s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 4005 = 1 + singles(112) + doubles(3892)
+       blocks: S_a=56, S_b=56, D_aa=378, D_ab=3136, D_bb=378
+  CISD: E = -14.623211824868896 | wall = 0.03s
+  RHF  for CC : E = -14.572873468246378 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 112, T2 = 3892, CCSD_amp = 4004
+       T2 blocks: aa=378, ab=3136, bb=378
+  CCSD(T) independent triples size: T3 = 42336, CCSD+T3 = 46340
+       T3 blocks: aaa=0, aab=21168, abb=21168, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 3192, T3_spatial = 175616
+  Tensor proxy: CCSD_amp_tensor = 9520, T3_tensor = 11239424
+  CCSD:    E = -14.623558921961235 | conv = True
+  (T):     E_T = -2.312199204783749e-04
+  CCSD(T): E = -14.623790141881713 | wall = 0.47s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pvqz           
+Family = cc-pVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 55, nbas = 14, lmax = 4, shells = {0: 4, 1: 4, 2: 3, 3: 2, 4: 1}
+  RHF  for FCI: E = -14.572968127198623 | conv = True | wall = 0.05s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 55, nalpha = 2, nbeta = 2, FCI_dim = 2205225
+  FCI: E = -14.640123878376100 | wall = 1015.17s
+  RHF  for CISD: E = -14.572968127198632 | conv = True | wall = 0.15s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 14205 = 1 + singles(212) + doubles(13992)
+       blocks: S_a=106, S_b=106, D_aa=1378, D_ab=11236, D_bb=1378
+  CISD: E = -14.638040597388772 | wall = 1.68s
+  RHF  for CC : E = -14.572968127198642 | conv = True | wall = 0.14s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 212, T2 = 13992, CCSD_amp = 14204
+       T2 blocks: aa=1378, ab=11236, bb=1378
+  CCSD(T) independent triples size: T3 = 292136, CCSD+T3 = 306340
+       T3 blocks: aaa=0, aab=146068, abb=146068, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 11342, T3_spatial = 1191016
+  Tensor proxy: CCSD_amp_tensor = 33920, T3_tensor = 76225024
+  CCSD:    E = -14.639588445714137 | conv = True
+  (T):     E_T = -4.948142803067817e-04
+  CCSD(T): E = -14.640083259994444 | wall = 2.66s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pcvdz          
+Family = cc-pCVXZ, aug = none, zeta = DZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 18, nbas = 7, lmax = 2, shells = {0: 3, 1: 3, 2: 1}
+  RHF  for FCI: E = -14.572338205258429 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 18, nalpha = 2, nbeta = 2, FCI_dim = 23409
+  FCI: E = -14.651833082250606 | wall = 1.78s
+  RHF  for CISD: E = -14.572338205258429 | conv = True | wall = 0.12s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 1329 = 1 + singles(64) + doubles(1264)
+       blocks: S_a=32, S_b=32, D_aa=120, D_ab=1024, D_bb=120
+  CISD: E = -14.648814475526128 | wall = 0.02s
+  RHF  for CC : E = -14.572338205258433 | conv = True | wall = 0.02s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 64, T2 = 1264, CCSD_amp = 1328
+       T2 blocks: aa=120, ab=1024, bb=120
+  CCSD(T) independent triples size: T3 = 7680, CCSD+T3 = 9008
+       T3 blocks: aaa=0, aab=3840, abb=3840, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 1056, T3_spatial = 32768
+  Tensor proxy: CCSD_amp_tensor = 3136, T3_tensor = 2097152
+  CCSD:    E = -14.651579580636326 | conv = True
+  (T):     E_T = -2.406433449282455e-04
+  CCSD(T): E = -14.651820223981256 | wall = 0.15s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pcvtz          
+Family = cc-pCVXZ, aug = none, zeta = TZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 43, nbas = 14, lmax = 3, shells = {0: 5, 1: 5, 2: 3, 3: 1}
+  RHF  for FCI: E = -14.572873483139226 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 43, nalpha = 2, nbeta = 2, FCI_dim = 815409
+  FCI: E = -14.662367538573353 | wall = 156.49s
+  RHF  for CISD: E = -14.572873483139244 | conv = True | wall = 0.12s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 8529 = 1 + singles(164) + doubles(8364)
+       blocks: S_a=82, S_b=82, D_aa=820, D_ab=6724, D_bb=820
+  CISD: E = -14.658611466264297 | wall = 0.08s
+  RHF  for CC : E = -14.572873483139224 | conv = True | wall = 0.04s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 164, T2 = 8364, CCSD_amp = 8528
+       T2 blocks: aa=820, ab=6724, bb=820
+  CCSD(T) independent triples size: T3 = 134480, CCSD+T3 = 143008
+       T3 blocks: aaa=0, aab=67240, abb=67240, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 6806, T3_spatial = 551368
+  Tensor proxy: CCSD_amp_tensor = 20336, T3_tensor = 35287552
+  CCSD:    E = -14.661899786616191 | conv = True
+  (T):     E_T = -4.404736983197454e-04
+  CCSD(T): E = -14.662340260314510 | wall = 1.42s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = cc-pcvqz          
+Family = cc-pCVXZ, aug = none, zeta = QZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 84, nbas = 23, lmax = 4, shells = {0: 7, 1: 7, 2: 5, 3: 3, 4: 1}
+  RHF  for FCI: E = -14.572968153476275 | conv = True | wall = 0.10s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 84, nalpha = 2, nbeta = 2, FCI_dim = 12152196
+  FCI: E = -14.665565792404376 | wall = 37883.91s
+  RHF  for CISD: E = -14.572968153476280 | conv = True | wall = 0.19s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 33867 = 1 + singles(328) + doubles(33538)
+       blocks: S_a=164, S_b=164, D_aa=3321, D_ab=26896, D_bb=3321
+  CISD: E = -14.661523773089083 | wall = 2.10s
+  RHF  for CC : E = -14.572968153476276 | conv = True | wall = 0.20s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 328, T2 = 33538, CCSD_amp = 33866
+       T2 blocks: aa=3321, ab=26896, bb=3321
+  CCSD(T) independent triples size: T3 = 1089288, CCSD+T3 = 1123154
+       T3 blocks: aaa=0, aab=544644, abb=544644, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 27060, T3_spatial = 4410944
+  Tensor proxy: CCSD_amp_tensor = 81016, T3_tensor = 282300416
+  CCSD:    E = -14.664940353394050 | conv = True
+  (T):     E_T = -5.920879391206094e-04
+  CCSD(T): E = -14.665532441333170 | wall = 12.75s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pvdz       
+Family = cc-pVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 23, nbas = 8, lmax = 2, shells = {0: 3, 1: 3, 2: 2}
+  RHF  for FCI: E = -14.572379149348915 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 23, nalpha = 2, nbeta = 2, FCI_dim = 64009
+  FCI: E = -14.617475909939056 | wall = 2.54s
+  RHF  for CISD: E = -14.572379149348915 | conv = True | wall = 0.13s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 2269 = 1 + singles(84) + doubles(2184)
+       blocks: S_a=42, S_b=42, D_aa=210, D_ab=1764, D_bb=210
+  CISD: E = -14.617419471401808 | wall = 0.03s
+  RHF  for CC : E = -14.572379149348915 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 84, T2 = 2184, CCSD_amp = 2268
+       T2 blocks: aa=210, ab=1764, bb=210
+  CCSD(T) independent triples size: T3 = 17640, CCSD+T3 = 19908
+       T3 blocks: aaa=0, aab=8820, abb=8820, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 1806, T3_spatial = 74088
+  Tensor proxy: CCSD_amp_tensor = 5376, T3_tensor = 4741632
+  CCSD:    E = -14.617433363544739 | conv = True
+  (T):     E_T = -4.006874870361740e-05
+  CCSD(T): E = -14.617473432293442 | wall = 0.26s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pvtz       
+Family = cc-pVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 46, nbas = 13, lmax = 3, shells = {0: 4, 1: 4, 2: 3, 3: 2}
+  RHF  for FCI: E = -14.572875342470187 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 46, nalpha = 2, nbeta = 2, FCI_dim = 1071225
+  FCI: E = -14.624424166148662 | wall = 244.45s
+  RHF  for CISD: E = -14.572875342470176 | conv = True | wall = 0.14s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 9813 = 1 + singles(176) + doubles(9636)
+       blocks: S_a=88, S_b=88, D_aa=946, D_ab=7744, D_bb=946
+  CISD: E = -14.623767503801863 | wall = 0.09s
+  RHF  for CC : E = -14.572875342470184 | conv = True | wall = 0.04s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 176, T2 = 9636, CCSD_amp = 9812
+       T2 blocks: aa=946, ab=7744, bb=946
+  CCSD(T) independent triples size: T3 = 166496, CCSD+T3 = 176308
+       T3 blocks: aaa=0, aab=83248, abb=83248, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 7832, T3_spatial = 681472
+  Tensor proxy: CCSD_amp_tensor = 23408, T3_tensor = 43614208
+  CCSD:    E = -14.624162723538459 | conv = True
+  (T):     E_T = -2.403460084073562e-04
+  CCSD(T): E = -14.624403069546867 | wall = 1.54s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pvqz       
+Family = cc-pVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 80, nbas = 19, lmax = 4, shells = {0: 5, 1: 5, 2: 4, 3: 3, 4: 2}
+  RHF  for FCI: E = -14.572969176363779 | conv = True | wall = 0.11s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 80, nalpha = 2, nbeta = 2, FCI_dim = 9985600
+  FCI: E = -14.640170796023433 | wall = 21989.49s
+  RHF  for CISD: E = -14.572969176363776 | conv = True | wall = 0.20s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 30655 = 1 + singles(312) + doubles(30342)
+       blocks: S_a=156, S_b=156, D_aa=3003, D_ab=24336, D_bb=3003
+  CISD: E = -14.638085655557918 | wall = 2.03s
+  RHF  for CC : E = -14.572969176363770 | conv = True | wall = 0.21s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 312, T2 = 30342, CCSD_amp = 30654
+       T2 blocks: aa=3003, ab=24336, bb=3003
+  CCSD(T) independent triples size: T3 = 936936, CCSD+T3 = 967590
+       T3 blocks: aaa=0, aab=468468, abb=468468, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 24492, T3_spatial = 3796416
+  Tensor proxy: CCSD_amp_tensor = 73320, T3_tensor = 242970624
+  CCSD:    E = -14.639634801015113 | conv = True
+  (T):     E_T = -4.953962566928782e-04
+  CCSD(T): E = -14.640130197271805 | wall = 9.34s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pcvdz      
+Family = cc-pCVXZ, aug = aug, zeta = DZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 27, nbas = 8, lmax = 2, shells = {0: 3, 1: 3, 2: 2}
+  RHF  for FCI: E = -14.572379159952922 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 27, nalpha = 2, nbeta = 2, FCI_dim = 123201
+  FCI: E = -14.651922489276931 | wall = 5.68s
+  RHF  for CISD: E = -14.572379159952936 | conv = True | wall = 0.13s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 3201 = 1 + singles(100) + doubles(3100)
+       blocks: S_a=50, S_b=50, D_aa=300, D_ab=2500, D_bb=300
+  CISD: E = -14.648895277410675 | wall = 0.03s
+  RHF  for CC : E = -14.572379159952913 | conv = True | wall = 0.03s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 100, T2 = 3100, CCSD_amp = 3200
+       T2 blocks: aa=300, ab=2500, bb=300
+  CCSD(T) independent triples size: T3 = 30000, CCSD+T3 = 33200
+       T3 blocks: aaa=0, aab=15000, abb=15000, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 2550, T3_spatial = 125000
+  Tensor proxy: CCSD_amp_tensor = 7600, T3_tensor = 8000000
+  CCSD:    E = -14.651664522880820 | conv = True
+  (T):     E_T = -2.449770588405404e-04
+  CCSD(T): E = -14.651909499939661 | wall = 0.38s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pcvtz      
+Family = cc-pCVXZ, aug = aug, zeta = TZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 59, nbas = 13, lmax = 3, shells = {0: 4, 1: 4, 2: 3, 3: 2}
+  RHF  for FCI: E = -14.572875553276761 | conv = True | wall = 0.05s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 59, nalpha = 2, nbeta = 2, FCI_dim = 2927521
+  FCI: E = -14.662397144919593 | wall = 1924.39s
+  RHF  for CISD: E = -14.572875553276729 | conv = True | wall = 0.16s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 16417 = 1 + singles(228) + doubles(16188)
+       blocks: S_a=114, S_b=114, D_aa=1596, D_ab=12996, D_bb=1596
+  CISD: E = -14.658640960318609 | wall = 1.77s
+  RHF  for CC : E = -14.572875553276749 | conv = True | wall = 0.16s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 228, T2 = 16188, CCSD_amp = 16416
+       T2 blocks: aa=1596, ab=12996, bb=1596
+  CCSD(T) independent triples size: T3 = 363888, CCSD+T3 = 380304
+       T3 blocks: aaa=0, aab=181944, abb=181944, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 13110, T3_spatial = 1481544
+  Tensor proxy: CCSD_amp_tensor = 39216, T3_tensor = 94818816
+  CCSD:    E = -14.661925091719857 | conv = True
+  (T):     E_T = -4.446500736284320e-04
+  CCSD(T): E = -14.662369741793485 | wall = 3.24s
+
+==========================================================================================================================
+System = Be_singlet   | Basis = aug-cc-pcvqz      
+Family = cc-pCVXZ, aug = aug, zeta = QZ
+==========================================================================================================================
+  nelec = 4, alpha/beta = (2, 2)
+  AO basis: nao = 109, nbas = 19, lmax = 4, shells = {0: 5, 1: 5, 2: 4, 3: 3, 4: 2}
+  RHF  for FCI: E = -14.572969203656788 | conv = True | wall = 1.78s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  FCI size: norb = 109, nalpha = 2, nbeta = 2, FCI_dim = 34644996
+  FCI: failed | Traceback (most recent call last):
+  File "/home/sjtu/TNNSOG/Pretrain/test.py", line 613, in run_fci
+    e_fci, fcivec = cisolver.kernel()
+                    ^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/fci/__init__.py", line 225, in kernel
+    return fcisolver_class.kernel(self, h1e, eri, norb, nelec, ci0,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/fci/direct_spin1.py", line 958, in kernel
+    e, c = kernel_ms1(self, h1e, eri, norb, nelec, ci0, link_index,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/fci/direct_spin1.py", line 729, in kernel_ms1
+    e, c = fci.eig(hop, ci0, precond, tol=tol, lindep=lindep,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/fci/direct_spin1.py", line 926, in eig
+    lib.davidson1(lambda xs: [op(x) for x in xs],
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/lib/linalg_helper.py", line 445, in davidson1
+    xs.append(xt[k])
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/pyscf/lib/linalg_helper.py", line 1532, in append
+    self.scr_h5[str(key)] = x
+    ~~~~~~~~~~~^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/h5py/_hl/group.py", line 486, in __setitem__
+    ds = self.create_dataset(None, data=obj)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/h5py/_hl/group.py", line 186, in create_dataset
+    dsid = dataset.make_new_dset(group, shape, dtype, data, name, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sjtu/.conda/envs/pyscf/lib/python3.11/site-packages/h5py/_hl/dataset.py", line 178, in make_new_dset
+    dset_id.write(h5s.ALL, h5s.ALL, data)
+  File "h5py/_objects.pyx", line 56, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 57, in h5py._objects.with_phil.wrapper
+  File "h5py/h5d.pyx", line 307, in h5py.h5d.DatasetID.write
+  File "h5py/_proxy.pyx", line 121, in h5py._proxy.dset_rw
+OSError: [Errno 28] Can't synchronously write data (file write failed: time = Tue May  5 01:57:52 2026
+, filename = '/tmp/zjrikix6', file descriptor = 4, errno = 28, error message = 'No space left on device', buf = 0x7c4911b5af50, total write size = 277156064, bytes this sub-write = 277156064, offset = 1662967808)
+
+  RHF  for CISD: E = -14.572969203656788 | conv = True | wall = 1.78s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CISD independent antisym size: CISD_dim = 57567 = 1 + singles(428) + doubles(57138)
+       blocks: S_a=214, S_b=214, D_aa=5671, D_ab=45796, D_bb=5671
+  CISD: E = -14.661537798268792 | wall = 3.11s
+  RHF  for CC : E = -14.572969203656779 | conv = True | wall = 1.86s
+       <S^2> = 0.00000000, 2S+1 = 1.00000000
+  CCSD independent antisym size: T1 = 428, T2 = 57138, CCSD_amp = 57566
+       T2 blocks: aa=5671, ab=45796, bb=5671
+  CCSD(T) independent triples size: T3 = 2427188, CCSD+T3 = 2484754
+       T3 blocks: aaa=0, aab=1213594, abb=1213594, bbb=0
+  Spatial compressed proxy: CCSD_amp_spatial = 46010, T3_spatial = 9800344
+  Tensor proxy: CCSD_amp_tensor = 137816, T3_tensor = 627222016
+  CCSD:    E = -14.664951159141928 | conv = True
+  (T):     E_T = -5.922891036152009e-04
+  CCSD(T): E = -14.665543448245543 | wall = 24.83s
+
+==========================================================================================================================
+Compact summary
+==========================================================================================================================
+    system        basis       status  basis_nao  basis_nbas  basis_lmax  fci_norb  fci_nalpha  fci_nbeta    FCI_dim FCI_status      E_FCI    wall_FCI_s  cisd_nmo_alpha  cisd_nmo_beta  cisd_nocc_alpha  cisd_nocc_beta  cisd_nvir_alpha  cisd_nvir_beta  CISD_dim  CISD_dim_singles  CISD_dim_doubles_antisym  CISD_dim_d_aa_antisym  CISD_dim_d_ab  CISD_dim_d_bb_antisym                          CISD_status     E_CISD  wall_CISD_s SCF_CC_REF  cc_nmo_alpha  cc_nmo_beta  cc_nocc_alpha  cc_nocc_beta  cc_nvir_alpha  cc_nvir_beta  cc_t1_dim  cc_t2_dim_antisym  cc_t2_aa_dim_antisym  cc_t2_ab_dim  cc_t2_bb_dim_antisym  ccsd_amp_dim_antisym  ccsd_t_triples_dim_antisym  ccsd_t_triples_aaa_dim_antisym  ccsd_t_triples_aab_dim_antisym  ccsd_t_triples_abb_dim_antisym  ccsd_t_triples_bbb_dim_antisym  ccsd_t_total_excitation_dim_antisym  ccsd_amp_dim_spatial_proxy  ccsd_t_triples_dim_spatial_proxy  ccsd_amp_size_tensor_proxy  ccsd_t_t3_size_tensor_proxy                          CCSD_status     E_CCSD           E_T   E_CCSD_T  wall_CCSD_T_s
+He_singlet      cc-pvdz           ok        5.0         3.0         1.0       5.0         1.0        1.0       25.0         ok  -2.887595      0.087972             5.0            5.0              1.0             1.0              4.0             4.0      25.0               8.0                      16.0                    0.0           16.0                    0.0                                   ok  -2.887595     0.008566        RHF           5.0          5.0            1.0           1.0            4.0           4.0        8.0               16.0                   0.0          16.0                   0.0                  24.0                         0.0                             0.0                             0.0                             0.0                             0.0                                 24.0                        20.0                               0.0                        56.0                       4096.0                                   ok  -2.887595 -1.582947e-20  -2.887595       0.074767
+He_singlet      cc-pvtz           ok       14.0         6.0         2.0      14.0         1.0        1.0      196.0         ok  -2.900232      0.037030            14.0           14.0              1.0             1.0             13.0            13.0     196.0              26.0                     169.0                    0.0          169.0                    0.0                                   ok  -2.900232     0.015601        RHF          14.0         14.0            1.0           1.0           13.0          13.0       26.0              169.0                   0.0         169.0                   0.0                 195.0                         0.0                             0.0                             0.0                             0.0                             0.0                                195.0                       182.0                               0.0                       533.0                     140608.0                                   ok  -2.900232  4.373589e-20  -2.900232       0.088275
+He_singlet      cc-pvqz           ok       30.0        10.0         3.0      30.0         1.0        1.0      900.0         ok  -2.902411      0.152058            30.0           30.0              1.0             1.0             29.0            29.0     900.0              58.0                     841.0                    0.0          841.0                    0.0                                   ok  -2.902411     0.025337        RHF          30.0         30.0            1.0           1.0           29.0          29.0       58.0              841.0                   0.0         841.0                   0.0                 899.0                         0.0                             0.0                             0.0                             0.0                             0.0                                899.0                       870.0                               0.0                      2581.0                    1560896.0                                   ok  -2.902411  1.412902e-20  -2.902411       0.555625
+He_singlet      cc-pv5z           ok       55.0        15.0         4.0      55.0         1.0        1.0     3025.0         ok  -2.903152      1.412758            55.0           55.0              1.0             1.0             54.0            54.0    3025.0             108.0                    2916.0                    0.0         2916.0                    0.0                                   ok  -2.903152     0.108249        RHF          55.0         55.0            1.0           1.0           54.0          54.0      108.0             2916.0                   0.0        2916.0                   0.0                3024.0                         0.0                             0.0                             0.0                             0.0                             0.0                               3024.0                      2970.0                               0.0                      8856.0                   10077696.0                                   ok  -2.903152  7.432130e-20  -2.903152       2.508018
+He_singlet      cc-pv6z           ok       91.0         6.0         5.0      91.0         1.0        1.0     8281.0         ok  -2.903432     23.390005            91.0           91.0              1.0             1.0             90.0            90.0    8281.0             180.0                    8100.0                    0.0         8100.0                    0.0                                   ok  -2.903432     0.733317        RHF          91.0         91.0            1.0           1.0           90.0          90.0      180.0             8100.0                   0.0        8100.0                   0.0                8280.0                         0.0                             0.0                             0.0                             0.0                             0.0                               8280.0                      8190.0                               0.0                     24480.0                   46656000.0                                   ok  -2.903432 -4.601843e-20  -2.903432      12.047517
+He_singlet  aug-cc-pvdz           ok        9.0         5.0         1.0       9.0         1.0        1.0       81.0         ok  -2.889548      0.018728             9.0            9.0              1.0             1.0              8.0             8.0      81.0              16.0                      64.0                    0.0           64.0                    0.0                                   ok  -2.889548     0.012131        RHF           9.0          9.0            1.0           1.0            8.0           8.0       16.0               64.0                   0.0          64.0                   0.0                  80.0                         0.0                             0.0                             0.0                             0.0                             0.0                                 80.0                        72.0                               0.0                       208.0                      32768.0                                   ok  -2.889548 -1.008849e-19  -2.889548       0.067058
+He_singlet  aug-cc-pvtz           ok       23.0         9.0         2.0      23.0         1.0        1.0      529.0         ok  -2.900598      0.111393            23.0           23.0              1.0             1.0             22.0            22.0     529.0              44.0                     484.0                    0.0          484.0                    0.0                                   ok  -2.900598     0.021341        RHF          23.0         23.0            1.0           1.0           22.0          22.0       44.0              484.0                   0.0         484.0                   0.0                 528.0                         0.0                             0.0                             0.0                             0.0                             0.0                                528.0                       506.0                               0.0                      1496.0                     681472.0                                   ok  -2.900598  1.275885e-20  -2.900598       0.235162
+He_singlet  aug-cc-pvqz           ok       46.0        14.0         3.0      46.0         1.0        1.0     2116.0         ok  -2.902534      0.604037            46.0           46.0              1.0             1.0             45.0            45.0    2116.0              90.0                    2025.0                    0.0         2025.0                    0.0                                   ok  -2.902534     0.060983        RHF          46.0         46.0            1.0           1.0           45.0          45.0       90.0             2025.0                   0.0        2025.0                   0.0                2115.0                         0.0                             0.0                             0.0                             0.0                             0.0                               2115.0                      2070.0                               0.0                      6165.0                    5832000.0                                   ok  -2.902534 -3.676218e-20  -2.902534       1.463545
+He_singlet  aug-cc-pv5z           ok       80.0        20.0         4.0      80.0         1.0        1.0     6400.0         ok  -2.903201     10.306236            80.0           80.0              1.0             1.0             79.0            79.0    6400.0             158.0                    6241.0                    0.0         6241.0                    0.0                                   ok  -2.903201     0.450261        RHF          80.0         80.0            1.0           1.0           79.0          79.0      158.0             6241.0                   0.0        6241.0                   0.0                6399.0                         0.0                             0.0                             0.0                             0.0                             0.0                               6399.0                      6320.0                               0.0                     18881.0                   31554496.0                                   ok  -2.903201  7.313094e-20  -2.903201       8.731381
+He_singlet  aug-cc-pv6z           ok      127.0        12.0         5.0     127.0         1.0        1.0    16129.0         ok  -2.903455    177.465944           127.0          127.0              1.0             1.0            126.0           126.0   16129.0             252.0                   15876.0                    0.0        15876.0                    0.0                                   ok  -2.903455     7.722532        RHF         127.0        127.0            1.0           1.0          126.0         126.0      252.0            15876.0                   0.0       15876.0                   0.0               16128.0                         0.0                             0.0                             0.0                             0.0                             0.0                              16128.0                     16002.0                               0.0                     47880.0                  128024064.0                                   ok  -2.903455  9.451964e-21  -2.903455      39.838557
+He_triplet      cc-pvdz           ok        5.0         3.0         1.0       5.0         2.0        0.0       10.0         ok  -1.401163      0.015319             5.0            5.0              2.0             0.0              3.0             5.0      10.0               6.0                       3.0                    3.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -1.401163     0.000086       ROHF           5.0          5.0            2.0           0.0            3.0           5.0        6.0                3.0                   3.0           0.0                   0.0                   9.0                         0.0                             0.0                             0.0                             0.0                             0.0                                  9.0                        42.0                               0.0                        42.0                       4096.0 fci_equivalent_two_electron_highspin  -1.401163  0.000000e+00  -1.401163       0.000046
+He_triplet      cc-pvtz           ok       14.0         6.0         2.0      14.0         2.0        0.0       91.0         ok  -1.915086      0.019480            14.0           14.0              2.0             0.0             12.0            14.0      91.0              24.0                      66.0                   66.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -1.915086     0.000082       ROHF          14.0         14.0            2.0           0.0           12.0          14.0       24.0               66.0                  66.0           0.0                   0.0                  90.0                         0.0                             0.0                             0.0                             0.0                             0.0                                 90.0                       600.0                               0.0                       600.0                     140608.0 fci_equivalent_two_electron_highspin  -1.915086  0.000000e+00  -1.915086       0.000038
+He_triplet      cc-pvqz           ok       30.0        10.0         3.0      30.0         2.0        0.0      435.0         ok  -1.993038      0.144492            30.0           30.0              2.0             0.0             28.0            30.0     435.0              56.0                     378.0                  378.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -1.993038     0.000070       ROHF          30.0         30.0            2.0           0.0           28.0          30.0       56.0              378.0                 378.0           0.0                   0.0                 434.0                         0.0                             0.0                             0.0                             0.0                             0.0                                434.0                      3192.0                               0.0                      3192.0                    1560896.0 fci_equivalent_two_electron_highspin  -1.993038  0.000000e+00  -1.993038       0.000034
+He_triplet      cc-pv5z           ok       55.0        15.0         4.0      55.0         2.0        0.0     1485.0         ok  -2.041941      2.065688            55.0           55.0              2.0             0.0             53.0            55.0    1485.0             106.0                    1378.0                 1378.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.041941     0.000081       ROHF          55.0         55.0            2.0           0.0           53.0          55.0      106.0             1378.0                1378.0           0.0                   0.0                1484.0                         0.0                             0.0                             0.0                             0.0                             0.0                               1484.0                     11342.0                               0.0                     11342.0                   10077696.0 fci_equivalent_two_electron_highspin  -2.041941  0.000000e+00  -2.041941       0.000036
+He_triplet      cc-pv6z           ok       91.0         6.0         5.0      91.0         2.0        0.0     4095.0         ok  -2.095736     37.907442            91.0           91.0              2.0             0.0             89.0            91.0    4095.0             178.0                    3916.0                 3916.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.095736     0.000238       ROHF          91.0         91.0            2.0           0.0           89.0          91.0      178.0             3916.0                3916.0           0.0                   0.0                4094.0                         0.0                             0.0                             0.0                             0.0                             0.0                               4094.0                     31862.0                               0.0                     31862.0                   46656000.0 fci_equivalent_two_electron_highspin  -2.095736  0.000000e+00  -2.095736       0.000066
+He_triplet  aug-cc-pvdz           ok        9.0         5.0         1.0       9.0         2.0        0.0       36.0         ok  -2.151148      0.016767             9.0            9.0              2.0             0.0              7.0             9.0      36.0              14.0                      21.0                   21.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.151148     0.000070       ROHF           9.0          9.0            2.0           0.0            7.0           9.0       14.0               21.0                  21.0           0.0                   0.0                  35.0                         0.0                             0.0                             0.0                             0.0                             0.0                                 35.0                       210.0                               0.0                       210.0                      32768.0 fci_equivalent_two_electron_highspin  -2.151148  0.000000e+00  -2.151148       0.000036
+He_triplet  aug-cc-pvtz           ok       23.0         9.0         2.0      23.0         2.0        0.0      253.0         ok  -2.169894      0.047454            23.0           23.0              2.0             0.0             21.0            23.0     253.0              42.0                     210.0                  210.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.169894     0.000099       ROHF          23.0         23.0            2.0           0.0           21.0          23.0       42.0              210.0                 210.0           0.0                   0.0                 252.0                         0.0                             0.0                             0.0                             0.0                             0.0                                252.0                      1806.0                               0.0                      1806.0                     681472.0 fci_equivalent_two_electron_highspin  -2.169894  0.000000e+00  -2.169894       0.000047
+He_triplet  aug-cc-pvqz           ok       46.0        14.0         3.0      46.0         2.0        0.0     1035.0         ok  -2.172216      0.747773            46.0           46.0              2.0             0.0             44.0            46.0    1035.0              88.0                     946.0                  946.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.172216     0.000070       ROHF          46.0         46.0            2.0           0.0           44.0          46.0       88.0              946.0                 946.0           0.0                   0.0                1034.0                         0.0                             0.0                             0.0                             0.0                             0.0                               1034.0                      7832.0                               0.0                      7832.0                    5832000.0 fci_equivalent_two_electron_highspin  -2.172216  0.000000e+00  -2.172216       0.000036
+He_triplet  aug-cc-pv5z           ok       80.0        20.0         4.0      80.0         2.0        0.0     3160.0         ok  -2.172866     19.236468            80.0           80.0              2.0             0.0             78.0            80.0    3160.0             156.0                    3003.0                 3003.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.172866     0.000139       ROHF          80.0         80.0            2.0           0.0           78.0          80.0      156.0             3003.0                3003.0           0.0                   0.0                3159.0                         0.0                             0.0                             0.0                             0.0                             0.0                               3159.0                     24492.0                               0.0                     24492.0                   31554496.0 fci_equivalent_two_electron_highspin  -2.172866  0.000000e+00  -2.172866       0.000047
+He_triplet  aug-cc-pv6z           ok      127.0        12.0         5.0     127.0         2.0        0.0     8001.0         ok  -2.173442    365.569082           127.0          127.0              2.0             0.0            125.0           127.0    8001.0             250.0                    7750.0                 7750.0            0.0                    0.0 fci_equivalent_two_electron_highspin  -2.173442     0.000195       ROHF         127.0        127.0            2.0           0.0          125.0         127.0      250.0             7750.0                7750.0           0.0                   0.0                8000.0                         0.0                             0.0                             0.0                             0.0                             0.0                               8000.0                     62750.0                               0.0                     62750.0                  128024064.0 fci_equivalent_two_electron_highspin  -2.173442  0.000000e+00  -2.173442       0.000042
+Li_doublet      cc-pvdz           ok       14.0         5.0         2.0      14.0         2.0        1.0     1274.0         ok  -7.432638      0.097906            14.0           14.0              2.0             1.0             12.0            13.0     416.0              37.0                     378.0                   66.0          312.0                    0.0                                   ok  -7.364798     0.044949        UHF          14.0         14.0            2.0           1.0           12.0          13.0       37.0              378.0                  66.0         312.0                   0.0                 415.0                       858.0                             0.0                           858.0                             0.0                             0.0                               1273.0                       600.0                           13824.0                      1094.0                     421875.0                                   ok  -7.432637 -2.371595e-07  -7.432638       0.269131
+Li_doublet      cc-pvtz           ok       30.0         9.0         3.0      30.0         2.0        1.0    13050.0         ok  -7.446069      1.717636            30.0           30.0              2.0             1.0             28.0            29.0    2088.0              85.0                    2002.0                  378.0         1624.0                    0.0                                   ok  -7.446050     0.070735        UHF          30.0         30.0            2.0           1.0           28.0          29.0       85.0             2002.0                 378.0        1624.0                   0.0                2087.0                     10962.0                             0.0                         10962.0                             0.0                             0.0                              13049.0                      3192.0                          175616.0                      5686.0                    5000211.0                                   ok  -7.446050 -1.599278e-05  -7.446066       2.923656
+Li_doublet      cc-pvqz           ok       55.0        14.0         4.0      55.0         2.0        1.0    81675.0         ok  -7.449832     33.872951            55.0           55.0              2.0             1.0             53.0            54.0    7263.0             160.0                    7102.0                 1378.0         5724.0                    0.0                                   ok  -7.449798     0.461590        UHF          55.0         55.0            2.0           1.0           53.0          54.0      160.0             7102.0                1378.0        5724.0                   0.0                7262.0                     74412.0                             0.0                         74412.0                             0.0                             0.0                              81674.0                     11342.0                         1191016.0                     20036.0                   33076161.0                                   ok  -7.449798 -2.890529e-05  -7.449827      19.171731
+Li_doublet      cc-pv5z           ok       91.0        20.0         5.0      91.0         2.0        1.0   372645.0         ok  -7.459913   1168.766865            91.0           91.0              2.0             1.0             89.0            90.0   20205.0             268.0                   19936.0                 3916.0        16020.0                    0.0                                   ok  -7.459877     4.033215        UHF          91.0         91.0            2.0           1.0           89.0          90.0      268.0            19936.0                3916.0       16020.0                   0.0               20204.0                    352440.0                             0.0                        352440.0                             0.0                             0.0                             372644.0                     31862.0                         5639752.0                     56072.0                  154854153.0                                   ok  -7.459878 -3.011140e-05  -7.459908     119.809618
+Li_doublet     cc-pcvdz           ok       18.0         7.0         2.0      18.0         2.0        1.0     2754.0         ok  -7.466025      0.103741            18.0           18.0              2.0             1.0             16.0            17.0     714.0              49.0                     664.0                  120.0          544.0                    0.0                                   ok  -7.466021     0.037615        UHF          18.0         18.0            2.0           1.0           16.0          17.0       49.0              664.0                 120.0         544.0                   0.0                 713.0                      2040.0                             0.0                          2040.0                             0.0                             0.0                               2753.0                      1056.0                           32768.0                      1906.0                     970299.0                                   ok  -7.466021 -3.709690e-06  -7.466025       0.570112
+Li_doublet     cc-pcvtz           ok       43.0        14.0         3.0      43.0         2.0        1.0    38829.0         ok  -7.474251      7.618649            43.0           43.0              2.0             1.0             41.0            42.0    4389.0             124.0                    4264.0                  820.0         3444.0                    0.0                                   ok  -7.474224     0.173445        UHF          43.0         43.0            2.0           1.0           41.0          42.0      124.0             4264.0                 820.0        3444.0                   0.0                4388.0                     34440.0                             0.0                         34440.0                             0.0                             0.0                              38828.0                      6806.0                          551368.0                     12056.0                   15438249.0                                   ok  -7.474226 -2.202567e-05  -7.474248       9.960512
+Li_doublet     cc-pcvqz           ok       84.0        23.0         4.0      84.0         2.0        1.0   292824.0         ok  -7.476373    665.904662            84.0           84.0              2.0             1.0             82.0            83.0   17181.0             247.0                   16933.0                 3321.0        13612.0                    0.0                                   ok  -7.476331     3.571322        UHF          84.0         84.0            2.0           1.0           82.0          83.0      247.0            16933.0                3321.0       13612.0                   0.0               17180.0                    275643.0                             0.0                        275643.0                             0.0                             0.0                             292823.0                     27060.0                         4410944.0                     47644.0                  121287375.0                                   ok  -7.476333 -3.477956e-05  -7.476368      90.055016
+Li_doublet     cc-pcv5z build_failed        NaN         NaN         NaN       NaN         NaN        NaN        NaN        NaN        NaN           NaN             NaN            NaN              NaN             NaN              NaN             NaN       NaN               NaN                       NaN                    NaN            NaN                    NaN                                  NaN        NaN          NaN        NaN           NaN          NaN            NaN           NaN            NaN           NaN        NaN                NaN                   NaN           NaN                   NaN                   NaN                         NaN                             NaN                             NaN                             NaN                             NaN                                  NaN                         NaN                               NaN                         NaN                          NaN                                  NaN        NaN           NaN        NaN            NaN
+Li_doublet  aug-cc-pvdz           ok       23.0         8.0         2.0      23.0         2.0        1.0     5819.0         ok  -7.432659      0.194932            23.0           23.0              2.0             1.0             21.0            22.0    1199.0              64.0                    1134.0                  210.0          924.0                    0.0                                   ok  -7.364832     0.068537        UHF          23.0         23.0            2.0           1.0           21.0          22.0       64.0             1134.0                 210.0         924.0                   0.0                1198.0                      4620.0                             0.0                          4620.0                             0.0                             0.0                               5818.0                      1806.0                           74088.0                      3236.0                    2146689.0                                   ok  -7.432659 -2.595916e-07  -7.432659       1.260237
+Li_doublet  aug-cc-pvtz           ok       46.0        13.0         3.0      46.0         2.0        1.0    47610.0         ok  -7.446158     10.947211            46.0           46.0              2.0             1.0             44.0            45.0    5040.0             133.0                    4906.0                  946.0         3960.0                    0.0                                   ok  -7.446139     0.207291        UHF          46.0         46.0            2.0           1.0           44.0          45.0      133.0             4906.0                 946.0        3960.0                   0.0                5039.0                     42570.0                             0.0                         42570.0                             0.0                             0.0                              47609.0                      7832.0                          681472.0                     13862.0                   19034163.0                                   ok  -7.446138 -1.640498e-05  -7.446155      12.685511
+Li_doublet  aug-cc-pvqz           ok       80.0        19.0         4.0      80.0         2.0        1.0   252800.0         ok  -7.449920    428.703350            80.0           80.0              2.0             1.0             78.0            79.0   15563.0             235.0                   15327.0                 3003.0        12324.0                    0.0                                   ok  -7.449886     2.807648        UHF          80.0         80.0            2.0           1.0           78.0          79.0      235.0            15327.0                3003.0       12324.0                   0.0               15562.0                    237237.0                             0.0                        237237.0                             0.0                             0.0                             252799.0                     24492.0                         3796416.0                     43136.0                  104487111.0                                   ok  -7.449885 -2.897246e-05  -7.449914      64.893807
+Li_doublet  aug-cc-pv5z build_failed        NaN         NaN         NaN       NaN         NaN        NaN        NaN        NaN        NaN           NaN             NaN            NaN              NaN             NaN              NaN             NaN       NaN               NaN                       NaN                    NaN            NaN                    NaN                                  NaN        NaN          NaN        NaN           NaN          NaN            NaN           NaN            NaN           NaN        NaN                NaN                   NaN           NaN                   NaN                   NaN                         NaN                             NaN                             NaN                             NaN                             NaN                                  NaN                         NaN                               NaN                         NaN                          NaN                                  NaN        NaN           NaN        NaN            NaN
+Li_doublet aug-cc-pcvdz           ok       27.0         8.0         2.0      27.0         2.0        1.0     9477.0         ok  -7.466064      0.342414            27.0           27.0              2.0             1.0             25.0            26.0    1677.0              76.0                    1600.0                  300.0         1300.0                    0.0                                   ok  -7.466060     0.060178        UHF          27.0         27.0            2.0           1.0           25.0          26.0       76.0             1600.0                 300.0        1300.0                   0.0                1676.0                      7800.0                             0.0                          7800.0                             0.0                             0.0                               9476.0                      2550.0                          125000.0                      4552.0                    3581577.0                                   ok  -7.466060 -3.983876e-06  -7.466064       2.267507
+Li_doublet aug-cc-pcvtz           ok       59.0        13.0         3.0      59.0         2.0        1.0   100949.0         ok  -7.474268     65.768030            59.0           59.0              2.0             1.0             57.0            58.0    8381.0             172.0                    8208.0                 1596.0         6612.0                    0.0                                   ok  -7.474241     0.574276        UHF          59.0         59.0            2.0           1.0           57.0          58.0      172.0             8208.0                1596.0        6612.0                   0.0                8380.0                     92568.0                             0.0                         92568.0                             0.0                             0.0                             100948.0                     13110.0                         1481544.0                     23144.0                   41063625.0                                   ok  -7.474242 -2.231512e-05  -7.474264      23.255479
+Li_doublet aug-cc-pcvqz           ok      109.0        19.0         4.0     109.0         2.0        1.0   641574.0         ok  -7.476375   4540.251639           109.0          109.0              2.0             1.0            107.0           108.0   29106.0             322.0                   28783.0                 5671.0        23112.0                    0.0                                   ok  -7.476333     7.620692        UHF         109.0        109.0            2.0           1.0          107.0         108.0      322.0            28783.0                5671.0       23112.0                   0.0               29105.0                    612468.0                             0.0                        612468.0                             0.0                             0.0                             641573.0                     46010.0                         9800344.0                     80894.0                  268336125.0                                   ok  -7.476335 -3.482293e-05  -7.476370     188.439658
+Li_doublet aug-cc-pcv5z build_failed        NaN         NaN         NaN       NaN         NaN        NaN        NaN        NaN        NaN           NaN             NaN            NaN              NaN             NaN              NaN             NaN       NaN               NaN                       NaN                    NaN            NaN                    NaN                                  NaN        NaN          NaN        NaN           NaN          NaN            NaN           NaN            NaN           NaN        NaN                NaN                   NaN           NaN                   NaN                   NaN                         NaN                             NaN                             NaN                             NaN                             NaN                                  NaN                         NaN                               NaN                         NaN                          NaN                                  NaN        NaN           NaN        NaN            NaN
+Be_singlet      cc-pvdz           ok       14.0         5.0         2.0      14.0         2.0        2.0     8281.0         ok -14.617410      0.113657            14.0           14.0              2.0             2.0             12.0            12.0     757.0              48.0                     708.0                   66.0          576.0                   66.0                                   ok -14.617356     0.020707        RHF          14.0         14.0            2.0           2.0           12.0          12.0       48.0              708.0                  66.0         576.0                  66.0                 756.0                      3168.0                             0.0                          1584.0                          1584.0                             0.0                               3924.0                       600.0                           13824.0                      1776.0                     884736.0                                   ok -14.617369 -3.807738e-05 -14.617407       0.090907
+Be_singlet      cc-pvtz           ok       30.0         9.0         3.0      30.0         2.0        2.0   189225.0         ok -14.623810      9.333320            30.0           30.0              2.0             2.0             28.0            28.0    4005.0             112.0                    3892.0                  378.0         3136.0                  378.0                                   ok -14.623212     0.029572        RHF          30.0         30.0            2.0           2.0           28.0          28.0      112.0             3892.0                 378.0        3136.0                 378.0                4004.0                     42336.0                             0.0                         21168.0                         21168.0                             0.0                              46340.0                      3192.0                          175616.0                      9520.0                   11239424.0                                   ok -14.623559 -2.312199e-04 -14.623790       0.470201
+Be_singlet      cc-pvqz           ok       55.0        14.0         4.0      55.0         2.0        2.0  2205225.0         ok -14.640124   1015.174645            55.0           55.0              2.0             2.0             53.0            53.0   14205.0             212.0                   13992.0                 1378.0        11236.0                 1378.0                                   ok -14.638041     1.684632        RHF          55.0         55.0            2.0           2.0           53.0          53.0      212.0            13992.0                1378.0       11236.0                1378.0               14204.0                    292136.0                             0.0                        146068.0                        146068.0                             0.0                             306340.0                     11342.0                         1191016.0                     33920.0                   76225024.0                                   ok -14.639588 -4.948143e-04 -14.640083       2.658755
+Be_singlet     cc-pcvdz           ok       18.0         7.0         2.0      18.0         2.0        2.0    23409.0         ok -14.651833      1.782336            18.0           18.0              2.0             2.0             16.0            16.0    1329.0              64.0                    1264.0                  120.0         1024.0                  120.0                                   ok -14.648814     0.016519        RHF          18.0         18.0            2.0           2.0           16.0          16.0       64.0             1264.0                 120.0        1024.0                 120.0                1328.0                      7680.0                             0.0                          3840.0                          3840.0                             0.0                               9008.0                      1056.0                           32768.0                      3136.0                    2097152.0                                   ok -14.651580 -2.406433e-04 -14.651820       0.149721
+Be_singlet     cc-pcvtz           ok       43.0        14.0         3.0      43.0         2.0        2.0   815409.0         ok -14.662368    156.488037            43.0           43.0              2.0             2.0             41.0            41.0    8529.0             164.0                    8364.0                  820.0         6724.0                  820.0                                   ok -14.658611     0.080406        RHF          43.0         43.0            2.0           2.0           41.0          41.0      164.0             8364.0                 820.0        6724.0                 820.0                8528.0                    134480.0                             0.0                         67240.0                         67240.0                             0.0                             143008.0                      6806.0                          551368.0                     20336.0                   35287552.0                                   ok -14.661900 -4.404737e-04 -14.662340       1.418114
+Be_singlet     cc-pcvqz           ok       84.0        23.0         4.0      84.0         2.0        2.0 12152196.0         ok -14.665566  37883.914471            84.0           84.0              2.0             2.0             82.0            82.0   33867.0             328.0                   33538.0                 3321.0        26896.0                 3321.0                                   ok -14.661524     2.095953        RHF          84.0         84.0            2.0           2.0           82.0          82.0      328.0            33538.0                3321.0       26896.0                3321.0               33866.0                   1089288.0                             0.0                        544644.0                        544644.0                             0.0                            1123154.0                     27060.0                         4410944.0                     81016.0                  282300416.0                                   ok -14.664940 -5.920879e-04 -14.665532      12.747902
+Be_singlet  aug-cc-pvdz           ok       23.0         8.0         2.0      23.0         2.0        2.0    64009.0         ok -14.617476      2.543552            23.0           23.0              2.0             2.0             21.0            21.0    2269.0              84.0                    2184.0                  210.0         1764.0                  210.0                                   ok -14.617419     0.025352        RHF          23.0         23.0            2.0           2.0           21.0          21.0       84.0             2184.0                 210.0        1764.0                 210.0                2268.0                     17640.0                             0.0                          8820.0                          8820.0                             0.0                              19908.0                      1806.0                           74088.0                      5376.0                    4741632.0                                   ok -14.617433 -4.006875e-05 -14.617473       0.257095
+Be_singlet  aug-cc-pvtz           ok       46.0        13.0         3.0      46.0         2.0        2.0  1071225.0         ok -14.624424    244.453779            46.0           46.0              2.0             2.0             44.0            44.0    9813.0             176.0                    9636.0                  946.0         7744.0                  946.0                                   ok -14.623768     0.090135        RHF          46.0         46.0            2.0           2.0           44.0          44.0      176.0             9636.0                 946.0        7744.0                 946.0                9812.0                    166496.0                             0.0                         83248.0                         83248.0                             0.0                             176308.0                      7832.0                          681472.0                     23408.0                   43614208.0                                   ok -14.624163 -2.403460e-04 -14.624403       1.544918
+Be_singlet  aug-cc-pvqz           ok       80.0        19.0         4.0      80.0         2.0        2.0  9985600.0         ok -14.640171  21989.492533            80.0           80.0              2.0             2.0             78.0            78.0   30655.0             312.0                   30342.0                 3003.0        24336.0                 3003.0                                   ok -14.638086     2.034096        RHF          80.0         80.0            2.0           2.0           78.0          78.0      312.0            30342.0                3003.0       24336.0                3003.0               30654.0                    936936.0                             0.0                        468468.0                        468468.0                             0.0                             967590.0                     24492.0                         3796416.0                     73320.0                  242970624.0                                   ok -14.639635 -4.953963e-04 -14.640130       9.343377
+Be_singlet aug-cc-pcvdz           ok       27.0         8.0         2.0      27.0         2.0        2.0   123201.0         ok -14.651922      5.680970            27.0           27.0              2.0             2.0             25.0            25.0    3201.0             100.0                    3100.0                  300.0         2500.0                  300.0                                   ok -14.648895     0.030285        RHF          27.0         27.0            2.0           2.0           25.0          25.0      100.0             3100.0                 300.0        2500.0                 300.0                3200.0                     30000.0                             0.0                         15000.0                         15000.0                             0.0                              33200.0                      2550.0                          125000.0                      7600.0                    8000000.0                                   ok -14.651665 -2.449771e-04 -14.651909       0.378661
+Be_singlet aug-cc-pcvtz           ok       59.0        13.0         3.0      59.0         2.0        2.0  2927521.0         ok -14.662397   1924.388028            59.0           59.0              2.0             2.0             57.0            57.0   16417.0             228.0                   16188.0                 1596.0        12996.0                 1596.0                                   ok -14.658641     1.766113        RHF          59.0         59.0            2.0           2.0           57.0          57.0      228.0            16188.0                1596.0       12996.0                1596.0               16416.0                    363888.0                             0.0                        181944.0                        181944.0                             0.0                             380304.0                     13110.0                         1481544.0                     39216.0                   94818816.0                                   ok -14.661925 -4.446501e-04 -14.662370       3.242405
+Be_singlet aug-cc-pcvqz           ok      109.0        19.0         4.0     109.0         2.0        2.0 34644996.0     failed        NaN 153374.271039           109.0          109.0              2.0             2.0            107.0           107.0   57567.0             428.0                   57138.0                 5671.0        45796.0                 5671.0                                   ok -14.661538     3.105804        RHF         109.0        109.0            2.0           2.0          107.0         107.0      428.0            57138.0                5671.0       45796.0                5671.0               57566.0                   2427188.0                             0.0                       1213594.0                       1213594.0                             0.0                            2484754.0                     46010.0                         9800344.0                    137816.0                  627222016.0                                   ok -14.664951 -5.922891e-04 -14.665543      24.829181
+
+Saved full CSV:    atoms_dunning_classified_benchmark_v6.csv
+Saved partial CSV: atoms_dunning_classified_benchmark_v6_partial.csv
+Total wall time = 224919.39s

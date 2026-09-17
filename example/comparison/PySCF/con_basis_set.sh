@@ -1,0 +1,1 @@
+nohup python -u con_basis_set.py > con_basis_set.log 2>&1 &

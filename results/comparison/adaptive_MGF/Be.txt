@@ -1,0 +1,213 @@
+
+============================================================
+J.H. Be Table 5.10 adaptive scheme, multi-initial API
+initMode=nuList | runAllInitializations=1 | kappa_max=9 | max_inner=3
+Growth policy: one=1 two_ud=1 two_uu=0 three=0 other=0
+Using 1 initial coarse file(s):
+  [1] JH_BeGround_BthreeOther0_coarsened_fromExistingRaw_M2561_nu15_candidate.mat
+============================================================
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Starting Be adaptive run 1/1 from JH_BeGround_BthreeOther0_coarsened_fromExistingRaw_M2561_nu15_candidate.mat
+runTag = nu15
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Loaded initial Be space: JH_BeGround_BthreeOther0_coarsened_fromExistingRaw_M2561_nu15_candidate.mat
+Initial B^[0]: M=2561 | Mone=664 | Mtwo_ud=610 | Mtwo_uu=732 | Mthree=552 | Mother=2 | E0(coarse)=-14.644294042981715
+J.H. Table 5.10 target rows: kappa=1 M=1417 E=-14.644213; kappa=9 M=24775 E=-14.659783.
+Be-specific note: Table 5.10 keeps Mtwo_uu=264, Mthree=64, Mother=2 fixed; default growth only one/two_ud.
+Parameters: sigma=1, c=0.25, neighbor=cross, update=monotone_union, importance=partial_orthogonal, pairCache=1
+
+
+############################################################
+Be adaptive kappa = 1, epsilon = 5.000000e-01, runTag=nu15
+############################################################
+
+  inner 1 | M=2561 | Mone/two_ud/two_uu/three/other = 664 / 610 / 732 / 552 / 2
+  assembly: 6.73 s | loaded initial S0/H0 from coarse candidate | nnz(S/H)=6.503e+06/6.559e+06 | sparse est 0.195 GB
+  solve: 2.55 s | E=-14.644294042981715 | err(exact diag)=2.307e-02 | kept=2561 | residual=2.003e-15
+  important=1 / 2561 | score max=9.800e-01, min(nonzero)=3.271e-06 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2562 | unique new M=2561 | added=0 | new blocks one/two_ud/two_uu/three/other=664/610/732/552/2 | grow 0.05 s
+  M-record #1 | kappa.inner=1.1 | M=2561 | err=2.307e-02 | tAsm=6.7s tSol=2.6s tGrow=0.0s tSave=0.9s | cum=10.2s
+  inner closure reached for kappa=1; keep M=2561.
+
+>>> record kappa=1 | M=2561 | E=-14.644294042981715 | err=2.307e-02 | Mone=664 | Mud=610 | Muu=732 | M3=552 | Mother=2 | inner=1
+
+############################################################
+Be adaptive kappa = 2, epsilon = 2.500000e-01, runTag=nu15
+############################################################
+
+  inner 1 | M=2561 | Mone/two_ud/two_uu/three/other = 664 / 610 / 732 / 552 / 2
+  assembly: 0.00 s | reused full cached S/H (same basis keys) | nnz(S/H)=6.503e+06/6.559e+06 | sparse est 0.195 GB
+  solve: 2.56 s | E=-14.644294042981715 | err(exact diag)=2.307e-02 | kept=2561 | residual=2.003e-15
+  important=1 / 2561 | score max=9.800e-01, min(nonzero)=3.271e-06 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2562 | unique new M=2561 | added=0 | new blocks one/two_ud/two_uu/three/other=664/610/732/552/2 | grow 0.04 s
+  M-record #2 | kappa.inner=2.1 | M=2561 | err=2.307e-02 | tAsm=0.0s tSol=2.6s tGrow=0.0s tSave=0.9s | cum=14.6s
+  inner closure reached for kappa=2; keep M=2561.
+
+>>> record kappa=2 | M=2561 | E=-14.644294042981715 | err=2.307e-02 | Mone=664 | Mud=610 | Muu=732 | M3=552 | Mother=2 | inner=1
+
+############################################################
+Be adaptive kappa = 3, epsilon = 1.250000e-01, runTag=nu15
+############################################################
+
+  inner 1 | M=2561 | Mone/two_ud/two_uu/three/other = 664 / 610 / 732 / 552 / 2
+  assembly: 0.00 s | reused full cached S/H (same basis keys) | nnz(S/H)=6.503e+06/6.559e+06 | sparse est 0.195 GB
+  solve: 2.57 s | E=-14.644294042981715 | err(exact diag)=2.307e-02 | kept=2561 | residual=2.003e-15
+  important=1 / 2561 | score max=9.800e-01, min(nonzero)=3.271e-06 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2562 | unique new M=2561 | added=0 | new blocks one/two_ud/two_uu/three/other=664/610/732/552/2 | grow 0.04 s
+  M-record #3 | kappa.inner=3.1 | M=2561 | err=2.307e-02 | tAsm=0.0s tSol=2.6s tGrow=0.0s tSave=0.9s | cum=19.0s
+  inner closure reached for kappa=3; keep M=2561.
+
+>>> record kappa=3 | M=2561 | E=-14.644294042981715 | err=2.307e-02 | Mone=664 | Mud=610 | Muu=732 | M3=552 | Mother=2 | inner=1
+
+############################################################
+Be adaptive kappa = 4, epsilon = 6.250000e-02, runTag=nu15
+############################################################
+
+  inner 1 | M=2561 | Mone/two_ud/two_uu/three/other = 664 / 610 / 732 / 552 / 2
+  assembly: 0.00 s | reused full cached S/H (same basis keys) | nnz(S/H)=6.503e+06/6.559e+06 | sparse est 0.195 GB
+  solve: 2.58 s | E=-14.644294042981715 | err(exact diag)=2.307e-02 | kept=2561 | residual=2.003e-15
+  important=7 / 2561 | score max=9.800e-01, min(nonzero)=3.271e-06 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2694 | unique new M=2681 | added=120 | new blocks one/two_ud/two_uu/three/other=664/730/732/552/2 | grow 0.09 s
+  M-record #4 | kappa.inner=4.1 | M=2561 | err=2.307e-02 | tAsm=0.0s tSol=2.6s tGrow=0.1s tSave=0.9s | cum=23.4s
+
+  inner 2 | M=2681 | Mone/two_ud/two_uu/three/other = 664 / 730 / 732 / 552 / 2
+    Pair cache built: nAlphaPairs=775, nBetaPairs=775, time=142.39s
+    Incremental assembly: reused old block M=2561; assembled 120 new row(s) against M=2681 in 302.43s.
+  assembly: 303.92 s | incremental reuse old M=2561 -> new M=2681 (old basis is prefix of current basis) | nnz(S/H)=7.132e+06/7.188e+06 | sparse est 0.213 GB
+  solve: 2.98 s | E=-14.649368678504811 | err(exact diag)=1.799e-02 | kept=2681 | residual=4.576e-15
+  important=4 / 2681 | score max=9.728e-01, min(nonzero)=4.885e-07 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2734 | unique new M=2705 | added=24 | new blocks one/two_ud/two_uu/three/other=664/754/732/552/2 | grow 0.07 s
+  M-record #5 | kappa.inner=4.2 | M=2681 | err=1.799e-02 | tAsm=303.9s tSol=3.0s tGrow=0.1s tSave=0.9s | cum=331.4s
+
+  inner 3 | M=2705 | Mone/two_ud/two_uu/three/other = 664 / 754 / 732 / 552 / 2
+    Pair cache reused/updated: A 775->775 (+0), B 775->775 (+0), time=0.10s
+    Incremental assembly: reused old block M=2681; assembled 24 new row(s) against M=2705 in 29.80s.
+  assembly: 31.21 s | incremental reuse old M=2681 -> new M=2705 (old basis is prefix of current basis) | nnz(S/H)=7.261e+06/7.317e+06 | sparse est 0.217 GB
+  solve: 3.12 s | E=-14.649963908202105 | err(exact diag)=1.740e-02 | kept=2705 | residual=3.417e-15
+  important=2 / 2705 | score max=9.714e-01, min(nonzero)=9.773e-07 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2732 | unique new M=2705 | added=0 | new blocks one/two_ud/two_uu/three/other=664/754/732/552/2 | grow 0.05 s
+  M-record #6 | kappa.inner=4.3 | M=2705 | err=1.740e-02 | tAsm=31.2s tSol=3.1s tGrow=0.1s tSave=1.0s | cum=366.7s
+  inner closure reached for kappa=4; keep M=2705.
+
+>>> record kappa=4 | M=2705 | E=-14.649963908202105 | err=1.740e-02 | Mone=664 | Mud=754 | Muu=732 | M3=552 | Mother=2 | inner=3
+
+############################################################
+Be adaptive kappa = 5, epsilon = 3.125000e-02, runTag=nu15
+############################################################
+
+  inner 1 | M=2705 | Mone/two_ud/two_uu/three/other = 664 / 754 / 732 / 552 / 2
+  assembly: 0.00 s | reused full cached S/H (same basis keys) | nnz(S/H)=7.261e+06/7.317e+06 | sparse est 0.217 GB
+  solve: 3.13 s | E=-14.649963908202105 | err(exact diag)=1.740e-02 | kept=2705 | residual=3.417e-15
+  important=10 / 2705 | score max=9.714e-01, min(nonzero)=9.773e-07 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=2890 | unique new M=2705 | added=0 | new blocks one/two_ud/two_uu/three/other=664/754/732/552/2 | grow 0.08 s
+  M-record #7 | kappa.inner=5.1 | M=2705 | err=1.740e-02 | tAsm=0.0s tSol=3.1s tGrow=0.1s tSave=0.9s | cum=371.9s
+  inner closure reached for kappa=5; keep M=2705.
+
+>>> record kappa=5 | M=2705 | E=-14.649963908202105 | err=1.740e-02 | Mone=664 | Mud=754 | Muu=732 | M3=552 | Mother=2 | inner=1
+
+############################################################
+Be adaptive kappa = 6, epsilon = 1.562500e-02, runTag=nu15
+############################################################
+
+  inner 1 | M=2705 | Mone/two_ud/two_uu/three/other = 664 / 754 / 732 / 552 / 2
+  assembly: 0.00 s | reused full cached S/H (same basis keys) | nnz(S/H)=7.261e+06/7.317e+06 | sparse est 0.217 GB
+  solve: 3.05 s | E=-14.649963908202105 | err(exact diag)=1.740e-02 | kept=2705 | residual=3.417e-15
+  important=118 / 2705 | score max=9.714e-01, min(nonzero)=9.773e-07 | importance 0.01 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=5218 | unique new M=4145 | added=1440 | new blocks one/two_ud/two_uu/three/other=856/2002/732/552/2 | grow 0.53 s
+  M-record #8 | kappa.inner=6.1 | M=2705 | err=1.740e-02 | tAsm=0.0s tSol=3.0s tGrow=0.5s tSave=1.0s | cum=377.4s
+
+  inner 2 | M=4145 | Mone/two_ud/two_uu/three/other = 856 / 2002 / 732 / 552 / 2
+    Pair cache reused/updated: A 775->889 (+114), B 775->889 (+114), time=39.82s
+    Incremental assembly: reused old block M=2705; assembled 1440 new row(s) against M=4145 in 3729.15s.
+  assembly: 3733.85 s | incremental reuse old M=2705 -> new M=4145 (old basis is prefix of current basis) | nnz(S/H)=1.713e+07/1.718e+07 | sparse est 0.511 GB
+  solve: 11.30 s | E=-14.653878626044916 | err(exact diag)=1.348e-02 | kept=4145 | residual=1.708e-14
+  important=142 / 4145 | score max=9.633e-01, min(nonzero)=5.979e-07 | importance 0.02 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=7102 | unique new M=4661 | added=516 | new blocks one/two_ud/two_uu/three/other=952/2422/732/552/2 | grow 0.52 s
+  M-record #9 | kappa.inner=6.2 | M=4145 | err=1.348e-02 | tAsm=3733.8s tSol=11.3s tGrow=0.5s tSave=1.4s | cum=4124.6s
+
+  inner 3 | M=4661 | Mone/two_ud/two_uu/three/other = 952 / 2422 / 732 / 552 / 2
+    Pair cache reused/updated: A 889->889 (+0), B 889->889 (+0), time=0.17s
+    Incremental assembly: reused old block M=4145; assembled 516 new row(s) against M=4661 in 1583.30s.
+  assembly: 1588.07 s | incremental reuse old M=4145 -> new M=4661 (old basis is prefix of current basis) | nnz(S/H)=2.167e+07/2.172e+07 | sparse est 0.647 GB
+  solve: 16.61 s | E=-14.654447861704606 | err(exact diag)=1.291e-02 | kept=4661 | residual=5.832e-15
+  important=52 / 4661 | score max=9.617e-01, min(nonzero)=1.569e-06 | importance 0.02 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=5578 | unique new M=4769 | added=108 | new blocks one/two_ud/two_uu/three/other=952/2530/732/552/2 | grow 0.21 s
+  M-record #10 | kappa.inner=6.3 | M=4661 | err=1.291e-02 | tAsm=1588.1s tSol=16.6s tGrow=0.2s tSave=1.6s | cum=5731.1s
+
+>>> record kappa=6 | M=4661 | E=-14.654447861704606 | err=1.291e-02 | Mone=952 | Mud=2422 | Muu=732 | M3=552 | Mother=2 | inner=3
+
+############################################################
+Be adaptive kappa = 7, epsilon = 7.812500e-03, runTag=nu15
+############################################################
+
+  inner 1 | M=4769 | Mone/two_ud/two_uu/three/other = 952 / 2530 / 732 / 552 / 2
+    Pair cache reused/updated: A 889->889 (+0), B 889->889 (+0), time=0.17s
+    Incremental assembly: reused old block M=4661; assembled 108 new row(s) against M=4769 in 310.58s.
+  assembly: 315.64 s | incremental reuse old M=4661 -> new M=4769 (old basis is prefix of current basis) | nnz(S/H)=2.269e+07/2.274e+07 | sparse est 0.677 GB
+  solve: 18.20 s | E=-14.654450414925131 | err(exact diag)=1.291e-02 | kept=4769 | residual=7.794e-15
+  important=170 / 4769 | score max=9.617e-01, min(nonzero)=1.574e-06 | importance 0.02 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=7934 | unique new M=6111 | added=1342 | new blocks one/two_ud/two_uu/three/other=1204/3620/732/552/2 | grow 0.59 s
+  M-record #11 | kappa.inner=7.1 | M=4769 | err=1.291e-02 | tAsm=315.6s tSol=18.2s tGrow=0.6s tSave=1.6s | cum=6068.9s
+
+  inner 2 | M=6111 | Mone/two_ud/two_uu/three/other = 1204 / 3620 / 732 / 552 / 2
+    Pair cache reused/updated: A 889->1045 (+156), B 889->1045 (+156), time=60.60s
+    Incremental assembly: reused old block M=4769; assembled 1342 new row(s) against M=6111 in 5332.75s.
+  assembly: 5342.91 s | incremental reuse old M=4769 -> new M=6111 (old basis is prefix of current basis) | nnz(S/H)=3.729e+07/3.734e+07 | sparse est 1.112 GB
+  solve: 39.34 s | E=-14.655579692867105 | err(exact diag)=1.178e-02 | kept=6111 | residual=1.072e-14
+  important=122 / 6111 | score max=9.610e-01, min(nonzero)=1.223e-06 | importance 0.03 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=8652 | unique new M=6303 | added=192 | new blocks one/two_ud/two_uu/three/other=1204/3812/732/552/2 | grow 0.50 s
+  M-record #12 | kappa.inner=7.2 | M=6111 | err=1.178e-02 | tAsm=5342.9s tSol=39.3s tGrow=0.5s tSave=2.0s | cum=11453.8s
+
+  inner 3 | M=6303 | Mone/two_ud/two_uu/three/other = 1204 / 3812 / 732 / 552 / 2
+    Pair cache reused/updated: A 1045->1045 (+0), B 1045->1045 (+0), time=0.22s
+    Incremental assembly: reused old block M=6111; assembled 192 new row(s) against M=6303 in 726.46s.
+  assembly: 735.71 s | incremental reuse old M=6111 -> new M=6303 (old basis is prefix of current basis) | nnz(S/H)=3.967e+07/3.973e+07 | sparse est 1.183 GB
+  solve: 43.53 s | E=-14.655595289081683 | err(exact diag)=1.176e-02 | kept=6303 | residual=1.092e-14
+  important=266 / 6303 | score max=9.609e-01, min(nonzero)=1.193e-06 | importance 0.03 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=10884 | unique new M=7015 | added=712 | new blocks one/two_ud/two_uu/three/other=1612/4116/732/552/2 | grow 0.80 s
+  M-record #13 | kappa.inner=7.3 | M=6303 | err=1.176e-02 | tAsm=735.7s tSol=43.5s tGrow=0.8s tSave=2.2s | cum=12236.2s
+
+>>> record kappa=7 | M=6303 | E=-14.655595289081683 | err=1.176e-02 | Mone=1204 | Mud=3812 | Muu=732 | M3=552 | Mother=2 | inner=3
+
+############################################################
+Be adaptive kappa = 8, epsilon = 3.906250e-03, runTag=nu15
+############################################################
+
+  inner 1 | M=7015 | Mone/two_ud/two_uu/three/other = 1612 / 4116 / 732 / 552 / 2
+    Pair cache reused/updated: A 1045->1249 (+204), B 1045->1249 (+204), time=86.70s
+    Incremental assembly: reused old block M=6303; assembled 712 new row(s) against M=7015 in 3839.96s.
+  assembly: 3856.57 s | incremental reuse old M=6303 -> new M=7015 (old basis is prefix of current basis) | nnz(S/H)=4.915e+07/4.921e+07 | sparse est 1.466 GB
+  solve: 60.55 s | E=-14.655612137335204 | err(exact diag)=1.175e-02 | kept=7015 | residual=1.233e-14
+  important=706 / 7015 | score max=9.609e-01, min(nonzero)=1.313e-06 | importance 0.04 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=20526 | unique new M=11941 | added=4926 | new blocks one/two_ud/two_uu/three/other=2428/8226/732/552/2 | grow 2.11 s
+  M-record #14 | kappa.inner=8.1 | M=7015 | err=1.175e-02 | tAsm=3856.6s tSol=60.5s tGrow=2.1s tSave=2.7s | cum=16160.7s
+
+  inner 2 | M=11941 | Mone/two_ud/two_uu/three/other = 2428 / 8226 / 732 / 552 / 2
+    Pair cache reused/updated: A 1249->1777 (+528), B 1249->1777 (+528), time=260.29s
+    Incremental assembly: reused old block M=7015; assembled 4926 new row(s) against M=11941 in 41296.31s.
+  assembly: 41349.84 s | incremental reuse old M=7015 -> new M=11941 (old basis is prefix of current basis) | nnz(S/H)=1.425e+08/1.426e+08 | sparse est 4.249 GB
+  solve: 235.15 s | E=-14.657794138714802 | err(exact diag)=9.566e-03 | kept=11941 | residual=1.292e-14
+  important=1020 / 11941 | score max=9.610e-01, min(nonzero)=4.883e-07 | importance 0.10 s
+  row energy: zero=0.000000 one=0.000000 two_ud=0.000000 two_uu=0.000e+00 three=0.000e+00 other=0.000e+00 sum=0.000000000000000
+  grown raw=33372 | unique new M=17185 | added=5244 | new blocks one/two_ud/two_uu/three/other=2728/13170/732/552/2 | grow 3.38 s
+  M-record #15 | kappa.inner=8.2 | M=11941 | err=9.566e-03 | tAsm=41349.8s tSol=235.1s tGrow=3.4s tSave=4.0s | cum=57753.4s
+
+  inner 3 | M=17185 | Mone/two_ud/two_uu/three/other = 2728 / 13170 / 732 / 552 / 2
+    Pair cache reused/updated: A 1777->1849 (+72), B 1777->1849 (+72), time=38.25s
