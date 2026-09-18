@@ -23,7 +23,7 @@ The offline stage constructs kernel approximations in MATLAB using the SOG, WBT,
 
 The online stage uses these precomputed data to assemble the variational problem and optimize the tensor neural networks in Python. Shared utilities for neural networks, quadrature, and integration are provided in [sogtnn](sogtnn). The supplied data can be used directly without repeating the MATLAB preprocessing.
 
-To run SOG-TNN, first configure the [documented environment](environment/README.md), then run the following commands from the repository root, replacing the placeholders with the appropriate names:
+To run SOG-TNN, first configure the [documented environment](environment/sog-tnn/environment.txt), then run the following commands from the repository root, replacing the placeholders with the appropriate names:
 
 ```bash
 conda activate <environment_name>
